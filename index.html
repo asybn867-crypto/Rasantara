@@ -1246,63 +1246,28 @@
             if (e.target.id === 'addRecipeModal') closeAddRecipeModal();
         });
 
-        function handleAddRecipe(e) {
+        async function handleAddRecipe(e) {
             e.preventDefault();
-
+            if (!currentUser) { alert('Masuk terlebih dahulu untuk mengirim resep.'); openAuthModal(); return; }
             const name = document.getElementById('newRecipeName').value.trim();
             const region = document.getElementById('newRecipeRegion').value;
             const subRegion = document.getElementById('newRecipeSubRegion').value.trim();
             const halalStatus = document.getElementById('newRecipeHalalStatus').value;
-            let image = document.getElementById('newRecipeImage').value.trim();
+            const image = document.getElementById('newRecipeImage').value.trim() || getSmartFoodImage(name, region);
             const origin = document.getElementById('newRecipeOrigin').value.trim();
-            const ingredientsRaw = document.getElementById('newRecipeIngredients').value.trim();
-            const stepsRaw = document.getElementById('newRecipeSteps').value.trim();
+            const ingredients = document.getElementById('newRecipeIngredients').value.trim().split('\\n').filter(x => x.trim());
+            const steps = document.getElementById('newRecipeSteps').value.trim().split('\\n').filter(x => x.trim());
             const tips = document.getElementById('newRecipeTips').value.trim();
-
-            const ingredients = ingredientsRaw.split('\n').filter(item => item.trim() !== '');
-            const steps = stepsRaw.split('\n').filter(item => item.trim() !== '');
-
-            if (ingredients.length < 3) {
-                alert('Bahan-bahan harus diisi minimal 3 baris/poin takaran!');
-                return;
-            }
-            if (steps.length < 3) {
-                alert('Langkah memasak harus diisi minimal 3 tahapan instruksi!');
-                return;
-            }
-
-            if (!image) {
-                image = getSmartFoodImage(name, region);
-            }
-
-            const newRecipe = {
-                id: 'custom-' + Date.now(),
-                name: name,
-                region: region,
-                subRegion: subRegion,
-                halalStatus: halalStatus,
-                image: image,
-                cookingTime: '30-60 Min',
-                difficulty: 'Khas Daerah',
-                origin: origin,
-                ingredients: ingredients,
-                steps: steps,
-                tips: tips,
-                reviews: [],
-                discussions: [],
-                reports: 0
-            };
-
-            recipes.unshift(newRecipe);
-            localStorage.setItem('rasantara_recipes', JSON.stringify(recipes));
-
-            currentUser.points = (currentUser.points || 0) + 50;
-            updateSessionUser();
-            updateUserUI();
-
-            closeAddRecipeModal();
-            filterRecipes();
-            alert('Resep berhasil dipublikasikan! Anda mendapatkan +50 Poin Kontributor.');
+            if (ingredients.length < 3 || steps.length < 3) { alert('Bahan dan langkah memasak masing-masing minimal 3 baris.'); return; }
+            const recipe = {name,region,subRegion,halalStatus,image,cookingTime:'30-60 Menit',difficulty:'Khas Daerah',origin,ingredients,steps,tips,reviews:[],discussions:[],reports:0};
+            const submit = e.target.querySelector('button[type="submit"]');
+            submit.disabled = true; submit.textContent = 'Mengirim...';
+            try {
+                await apiRequest('/recipes/submit',{method:'POST',body:JSON.stringify({recipe})});
+                closeAddRecipeModal(); e.target.reset();
+                alert('Resep berhasil dikirim dan menunggu persetujuan admin sebelum tampil ke publik.');
+            } catch(err) { alert(err.message); }
+            finally { submit.disabled = false; submit.innerHTML = '<i class="fas fa-paper-plane"></i> Kirim untuk Ditinjau'; }
         }
 
         async function apiRequest(path, options = {}) {
