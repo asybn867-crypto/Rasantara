@@ -36,7 +36,7 @@ if(path==="/images/upload"&&req.method==="POST"){
  if(!file||typeof file.arrayBuffer!=="function")return json({error:"File gambar tidak ditemukan."},400);
  const allowed={"image/jpeg":1,"image/png":1,"image/webp":1,"image/gif":1};
  if(!allowed[file.type]||file.size<1||file.size>1400*1024)return json({error:"Format gambar harus JPG, PNG, WEBP, atau GIF dan maksimal 1,4 MB."},400);
- const id=crypto.randomUUID(),bytes=new Uint8Array(await file.arrayBuffer());
+ const id=crypto.randomUUID(),bytes=await file.arrayBuffer();
  await env.DB.prepare("INSERT INTO recipe_images(id,mime_type,image_data,created_at) VALUES(?,?,?,?)").bind(id,file.type,bytes,Date.now()).run();
  return json({ok:true,url:new URL("/api/images/"+id,req.url).toString()});
 }
@@ -45,7 +45,8 @@ if(imageMatch&&req.method==="GET"){
  await ensureRecipeImages(env);
  const row=await env.DB.prepare("SELECT mime_type,image_data FROM recipe_images WHERE id=?").bind(imageMatch[1]).first();
  if(!row)return new Response("Not found.",{status:404,headers:cors});
- return new Response(row.image_data,{headers:{...cors,"Content-Type":row.mime_type,"Cache-Control":"public, max-age=31536000, immutable","X-Content-Type-Options":"nosniff"}});
+ const stored=row.image_data;const bytes=stored instanceof ArrayBuffer?stored:ArrayBuffer.isView(stored)?stored.buffer.slice(stored.byteOffset,stored.byteOffset+stored.byteLength):new Uint8Array(stored).buffer;
+ return new Response(bytes,{headers:{...cors,"Content-Type":row.mime_type,"Content-Length":String(bytes.byteLength),"Cache-Control":"public, max-age=31536000, immutable","X-Content-Type-Options":"nosniff"}});
 }
 if(path==="/recipes/public"&&req.method==="GET"){await ensureRecipeSubmissions(env);const {results}=await env.DB.prepare("SELECT id,recipe_json FROM recipe_submissions WHERE status='approved' ORDER BY created_at DESC LIMIT 200").all();return json({recipes:results.map(r=>JSON.parse(r.recipe_json))});}
 if(path==="/recipes/submit"&&req.method==="POST"){await ensureRecipeSubmissions(env);const u=await getUser(req,env);if(!u)return json({error:"Login diperlukan untuk mengirim resep."},401);const b=await req.json(),recipe=b.recipe||{},name=clean(recipe.name);if(name.length<2||name.length>120||!Array.isArray(recipe.ingredients)||recipe.ingredients.length<3||!Array.isArray(recipe.steps)||recipe.steps.length<3)return json({error:"Data resep belum lengkap."},400);const id="community-"+crypto.randomUUID();recipe.id=id;await env.DB.prepare("INSERT INTO recipe_submissions(id,user_id,recipe_json,status,created_at) VALUES(?,?,?,'pending',?)").bind(id,u.id,JSON.stringify(recipe),Date.now()).run();return json({ok:true,id,status:"pending"});}
