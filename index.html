@@ -73,11 +73,14 @@
                 <!-- Action Bar & User Account Section -->
                 <div class="w-full md:w-auto flex flex-col sm:flex-row items-center gap-3">
                     <div class="w-full sm:w-60 relative">
-                        <input type="text" id="searchInput" onkeyup="filterRecipes()" placeholder="Cari resep atau bahan..." 
-                            class="w-full pl-11 pr-4 py-3 rounded-full text-gray-800 bg-white shadow-lg focus:outline-none focus:ring-4 focus:ring-orange-300 transition duration-200 placeholder-gray-400 text-sm font-medium">
+                        <input type="text" id="searchInput" oninput="filterRecipes();toggleSearchClear()" placeholder="Cari resep atau bahan..." 
+                            class="w-full pl-11 pr-10 py-3 rounded-full text-gray-800 bg-white shadow-lg focus:outline-none focus:ring-4 focus:ring-orange-300 transition duration-200 placeholder-gray-400 text-sm font-medium">
                         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-brand-500">
                             <i class="fas fa-search text-lg"></i>
                         </div>
+                        <button type="button" id="clearSearchBtn" onclick="clearRecipeSearch()" aria-label="Hapus teks pencarian" title="Hapus pencarian" class="hidden absolute inset-y-0 right-0 px-3 text-gray-400 hover:text-red-500 transition" style="border:0;background:transparent">
+                            <i class="fas fa-times"></i>
+                        </button>
                     </div>
 
                     <button onclick="openAddRecipeModal()" class="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white font-bold px-4 py-3 rounded-full shadow transition duration-200 flex items-center justify-center gap-2 text-sm whitespace-nowrap border border-white/30">
@@ -1159,6 +1162,20 @@
                 activeTab.classList.add('bg-brand-500', 'text-white', 'shadow-md');
             }
             filterRecipes();
+        }
+
+        function toggleSearchClear() {
+            const input = document.getElementById("searchInput");
+            const button = document.getElementById("clearSearchBtn");
+            if (input && button) button.classList.toggle("hidden", !input.value);
+        }
+        function clearRecipeSearch() {
+            const input = document.getElementById("searchInput");
+            if (!input) return;
+            input.value = "";
+            toggleSearchClear();
+            filterRecipes();
+            input.focus();
         }
 
         function filterRecipes() {
