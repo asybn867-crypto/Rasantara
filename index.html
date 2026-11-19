@@ -83,9 +83,6 @@
                     <button onclick="openAddRecipeModal()" class="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white font-bold px-4 py-3 rounded-full shadow transition duration-200 flex items-center justify-center gap-2 text-sm whitespace-nowrap border border-white/30">
                         <i class="fas fa-plus-circle text-base"></i> Tambah Resep
                     </button>
-                    <button onclick="document.getElementById('communitySection').scrollIntoView({behavior:'smooth'})" class="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white font-bold px-4 py-3 rounded-full shadow transition duration-200 flex items-center justify-center gap-2 text-sm whitespace-nowrap border border-white/30">
-                        <i class="fas fa-users"></i> Komunitas
-                    </button>
                     <button onclick="openComplaintModal()" class="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white font-bold px-4 py-3 rounded-full shadow transition duration-200 flex items-center justify-center gap-2 text-sm whitespace-nowrap border border-white/30">
                         <i class="fas fa-headset"></i> Komplain
                     </button>
@@ -167,12 +164,7 @@
             <h3 class="text-xl font-bold text-gray-800 mb-1" id="emptyTitle">Resep Tidak Ditemukan</h3>
             <p class="text-gray-500 text-sm max-w-sm mx-auto" id="emptyDesc">Coba cari dengan kata kunci lain atau pilih kategori daerah yang berbeda.</p>
         </div>
-        <section id="communitySection" class="mt-12 bg-white rounded-3xl border border-orange-100 shadow-md p-5 sm:p-7">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5"><div><h2 class="text-xl font-bold font-serif text-gray-900"><i class="fas fa-users text-brand-500 mr-2"></i>Komunitas Rasantara</h2><p class="text-xs text-gray-500 mt-1">Komentar publik yang dapat dibaca semua pengunjung.</p></div><button onclick="loadPublicComments()" class="text-xs font-bold text-brand-600 hover:underline"><i class="fas fa-rotate"></i> Muat ulang</button></div>
-            <form onsubmit="submitPublicComment(event)" class="space-y-3 mb-5"><textarea id="publicCommentInput" required minlength="2" maxlength="1000" rows="3" placeholder="Bagikan pendapat atau pengalaman memasakmu..." class="w-full px-4 py-3 rounded-2xl border border-orange-100 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"></textarea><div class="flex justify-end"><button type="submit" class="px-5 py-2.5 bg-brand-500 hover:bg-brand-600 text-white rounded-full text-xs font-bold"><i class="fas fa-paper-plane mr-1"></i> Kirim komentar</button></div></form>
-            <div id="publicCommentsList" class="space-y-3"><p class="text-xs text-gray-400">Memuat komentar...</p></div>
-        </section>
-    </main>
+   </main>
 
     <div id="complaintModal" class="fixed inset-0 z-[60] hidden bg-black/60 backdrop-blur-sm items-center justify-center p-4"><div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-6 relative"><button onclick="closeComplaintModal()" class="absolute top-4 right-4 text-gray-400"><i class="fas fa-times"></i></button><h2 class="text-xl font-bold font-serif text-gray-900 mb-1"><i class="fas fa-headset text-brand-500 mr-2"></i>Komplain Pelanggan</h2><p class="text-xs text-gray-500 mb-4">Komplain disimpan di Cloudflare dan hanya dapat dikelola admin.</p><form onsubmit="submitComplaint(event)" class="space-y-3"><input id="complaintSubject" required maxlength="120" placeholder="Subjek komplain" class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm"><textarea id="complaintMessage" required minlength="10" maxlength="3000" rows="5" placeholder="Jelaskan kendala atau keluhanmu..." class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm"></textarea><button class="w-full py-3 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-sm font-bold">Kirim komplain</button></form></div></div>
 
@@ -262,29 +254,6 @@
                     </div>
                 </div>
 
-                <!-- SECTION: MENU DISKUSI -->
-                <div class="border-t border-gray-100 pt-6">
-                    <h3 class="text-lg font-bold text-gray-900 mb-2 flex items-center gap-2">
-                        <i class="fas fa-comments text-brand-500"></i> Tanya Jawab & Diskusi Masak
-                    </h3>
-                    <p class="text-xs text-gray-500 mb-4">Ada yang salah atau gagal dengan masakanmu? Tanyakan kendalamu di sini agar dibantu sesama koki.</p>
-
-                    <form onsubmit="handleDiscussionSubmit(event)" class="bg-orange-50/50 p-4 rounded-2xl border border-orange-100 mb-4 space-y-3">
-                        <h4 class="font-bold text-xs uppercase tracking-wider text-gray-700">Ajukan Pertanyaan Masak</h4>
-                        <div>
-                            <textarea id="discussionInput" required rows="2" placeholder="Contoh: Kok kuah rawon saya jadi terlalu asin ya?" 
-                                class="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"></textarea>
-                        </div>
-                        <div class="flex justify-end">
-                            <button type="submit" class="px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1.5">
-                                <i class="fas fa-paper-plane"></i> Kirim Pertanyaan
-                            </button>
-                        </div>
-                    </form>
-
-                    <div id="discussionList" class="space-y-3"></div>
-                </div>
-
                 <!-- SECTION: ULASAN & RATING -->
                 <div class="border-t border-gray-100 pt-6">
                     <h3 class="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
@@ -292,7 +261,7 @@
                     </h3>
 
                     <form onsubmit="handleReviewSubmit(event)" class="bg-gray-50 p-4 rounded-2xl border border-gray-200 mb-4 space-y-3">
-                        <h4 class="font-bold text-xs uppercase tracking-wider text-gray-700">Tulis Ulasan Anda (+10 Poin)</h4>
+                        <h4 class="font-bold text-xs uppercase tracking-wider text-gray-700">Beri Rating dan Tulis Komentar</h4>
                         <div class="flex items-center gap-3">
                             <span class="text-sm text-gray-600 font-medium">Bintang:</span>
                             <div class="flex gap-1 text-xl text-amber-400 cursor-pointer" id="starSelector">
@@ -305,7 +274,7 @@
                             <input type="hidden" id="reviewRatingVal" value="5">
                         </div>
                         <div>
-                            <textarea id="reviewComment" required rows="2" placeholder="Bagikan kesan atau pengalaman Anda memasak resep ini..." 
+                            <textarea id="reviewComment" required rows="2" placeholder="Tulis komentar khusus untuk makanan ini..." 
                                 class="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"></textarea>
                         </div>
                         <div class="flex justify-end">
@@ -763,6 +732,7 @@
         ];
 
         let recipes = JSON.parse(localStorage.getItem('rasantara_recipes')) || defaultRecipes;
+        let ratingSummaryCache = {};
         let currentUser = localStorage.getItem('rasantara_token') ? (JSON.parse(localStorage.getItem('rasantara_current_user')) || null) : null;
         let isRegisterMode = false;
         let currentCategory = 'all';
@@ -794,6 +764,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             updateUserUI();
             renderRecipes(recipes);
+            refreshRatingSummaries();
         });
 
         function getUserBadge(points) {
@@ -1070,9 +1041,8 @@
         }
 
         function calculateAverageRating(recipe) {
-            if (!recipe.reviews || recipe.reviews.length === 0) return '5.0';
-            const sum = recipe.reviews.reduce((acc, r) => acc + r.rating, 0);
-            return (sum / recipe.reviews.length).toFixed(1);
+            const summary = ratingSummaryCache[recipe.id];
+            return summary ? Number(summary.average).toFixed(1) : '0.0';
         }
 
         function toggleFavorite(id) {
@@ -1236,8 +1206,8 @@
                 stepsContainer.appendChild(li);
             });
 
-            renderReviewsList(recipe);
-            renderDiscussionList(recipe);
+            setRatingInput(5);
+            loadRecipeReviews(recipe.id);
             const modal = document.getElementById('recipeModal');
             const container = document.getElementById('modalContainer');
             modal.classList.remove('hidden');
@@ -1326,6 +1296,102 @@
             if (!response.ok) throw new Error(data.error || 'Permintaan gagal.');
             return data;
         }
+        async function refreshRatingSummaries() {
+            try {
+                const data = await apiRequest('/ratings');
+                ratingSummaryCache = {};
+                (data.ratings || []).forEach(item => {
+                    ratingSummaryCache[item.recipe_id] = {average: item.average, count: item.count};
+                });
+                filterRecipes();
+                if (currentActiveRecipeId) {
+                    const recipe = recipes.find(r => r.id === currentActiveRecipeId);
+                    if (recipe) {
+                        document.getElementById('modalRatingVal').innerText = calculateAverageRating(recipe);
+                        document.getElementById('modalReviewCount').innerText = ratingSummaryCache[recipe.id]?.count || 0;
+                    }
+                }
+            } catch (err) {
+                console.error('Gagal memuat rating:', err);
+            }
+        }
+        function setRatingInput(value) {
+            const rating = Math.max(1, Math.min(5, Number(value) || 5));
+            document.getElementById('reviewRatingVal').value = rating;
+            document.querySelectorAll('#starSelector [data-val]').forEach(star => {
+                const active = Number(star.dataset.val) <= rating;
+                star.classList.toggle('text-amber-400', active);
+                star.classList.toggle('text-gray-300', !active);
+            });
+        }
+        async function loadRecipeReviews(recipeId) {
+            const list = document.getElementById('reviewsList');
+            list.innerHTML = '<p class="text-xs text-gray-400">Memuat komentar...</p>';
+            try {
+                const data = await apiRequest('/recipes/' + encodeURIComponent(recipeId) + '/reviews');
+                list.innerHTML = '';
+                if (!data.reviews || !data.reviews.length) {
+                    list.innerHTML = '<p class="text-xs text-gray-400">Belum ada komentar untuk makanan ini.</p>';
+                } else {
+                    data.reviews.forEach(review => {
+                        const card = document.createElement('article');
+                        card.className = 'bg-orange-50/60 border border-orange-100 rounded-2xl p-4';
+                        const header = document.createElement('div');
+                        header.className = 'flex items-center justify-between gap-3 mb-2';
+                        const name = document.createElement('strong');
+                        name.className = 'text-xs text-brand-700';
+                        name.textContent = review.name;
+                        const stars = document.createElement('span');
+                        stars.className = 'text-amber-400 text-xs whitespace-nowrap';
+                        stars.textContent = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
+                        const comment = document.createElement('p');
+                        comment.className = 'text-sm text-gray-700 whitespace-pre-wrap';
+                        comment.textContent = review.comment;
+                        const date = document.createElement('p');
+                        date.className = 'text-[10px] text-gray-400 mt-2';
+                        date.textContent = new Date(Number(review.created_at)).toLocaleString('id-ID');
+                        header.append(name, stars);
+                        card.append(header, comment, date);
+                        list.appendChild(card);
+                    });
+                }
+                const summary = (data.reviews || []).length
+                    ? data.reviews.reduce((sum, item) => sum + Number(item.rating), 0) / data.reviews.length
+                    : 0;
+                ratingSummaryCache[recipeId] = {average: summary, count: (data.reviews || []).length};
+                const recipe = recipes.find(r => r.id === recipeId);
+                if (recipe) {
+                    document.getElementById('modalRatingVal').innerText = summary.toFixed(1);
+                    document.getElementById('modalReviewCount').innerText = (data.reviews || []).length;
+                    filterRecipes();
+                }
+            } catch (err) {
+                list.innerHTML = '<p class="text-xs text-red-500">Komentar belum bisa dimuat. Periksa koneksi Cloudflare.</p>';
+            }
+        }
+        async function handleReviewSubmit(event) {
+            event.preventDefault();
+            if (!currentUser) {
+                alert('Masuk terlebih dahulu untuk memberi rating dan komentar.');
+                openAuthModal();
+                return;
+            }
+            if (!currentActiveRecipeId) return;
+            const comment = document.getElementById('reviewComment').value.trim();
+            const rating = Number(document.getElementById('reviewRatingVal').value);
+            try {
+                await apiRequest('/recipes/' + encodeURIComponent(currentActiveRecipeId) + '/reviews', {
+                    method: 'POST',
+                    body: JSON.stringify({rating, comment})
+                });
+                document.getElementById('reviewComment').value = '';
+                await loadRecipeReviews(currentActiveRecipeId);
+                alert('Rating dan komentar untuk makanan ini berhasil disimpan.');
+            } catch (err) {
+                alert(err.message);
+            }
+        }
+
         function openComplaintModal() {
             if (!currentUser) { alert('Masuk terlebih dahulu untuk mengirim komplain.'); openAuthModal(); return; }
             const el = document.getElementById('complaintModal'); el.classList.remove('hidden'); el.classList.add('flex');
@@ -1337,22 +1403,6 @@
                 e.target.reset(); closeComplaintModal(); alert('Komplain berhasil disimpan di Cloudflare.');
             } catch(err) { alert(err.message); }
         }
-        async function loadPublicComments() {
-            const list=document.getElementById('publicCommentsList');
-            try { const data=await apiRequest('/comments'); list.innerHTML='';
-                if (!data.comments.length) { list.innerHTML='<p class="text-xs text-gray-400">Belum ada komentar. Jadilah yang pertama.</p>'; return; }
-                data.comments.forEach(c=>{ const card=document.createElement('article'); card.className='bg-orange-50/60 border border-orange-100 rounded-2xl p-4';
-                    const head=document.createElement('div'); head.className='text-xs font-bold text-brand-700 mb-1'; head.textContent=c.name+' · '+new Date(c.created_at).toLocaleString('id-ID');
-                    const body=document.createElement('p'); body.className='text-sm text-gray-700 whitespace-pre-wrap'; body.textContent=c.message; card.append(head,body); list.appendChild(card); });
-            } catch(err) { list.innerHTML='<p class="text-xs text-red-500">Komentar belum bisa dimuat. Backend Cloudflare belum aktif atau belum dikonfigurasi.</p>'; }
-        }
-        async function submitPublicComment(e) {
-            e.preventDefault(); if (!currentUser) { alert('Masuk terlebih dahulu untuk berkomentar.'); openAuthModal(); return; }
-            const input=document.getElementById('publicCommentInput');
-            try { await apiRequest('/comments',{method:'POST',body:JSON.stringify({message:input.value.trim()})}); input.value=''; await loadPublicComments(); }
-            catch(err) { alert(err.message); }
-        }
-        document.addEventListener('DOMContentLoaded', () => { loadPublicComments(); });
     </script>
     <script src="enhancements.js"></script>
 </body>
