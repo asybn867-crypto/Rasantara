@@ -54,7 +54,7 @@ async function submitComplaint(event) {
     event.preventDefault();
     try {
         const result = await api("/api/complaints", { method: "POST", body: JSON.stringify({ subject: document.getElementById("complaintSubject").value, message: document.getElementById("complaintMessage").value }) });
-        closeFeatureModal("complaintModal"); showMessage(result.message);
+        closeFeatureModal("complaintModal"); showMessage(result.message || "Komplain berhasil dikirim.");
     } catch (error) { showMessage(error.message); }
 }
 
@@ -62,7 +62,7 @@ window.handleAuthSubmit = async function(event) {
     event.preventDefault();
     const email = document.getElementById("authEmail").value.trim().toLowerCase();
     const password = document.getElementById("authPassword").value;
-    const endpoint = isRegisterMode ? "/api/register" : "/api/login";
+    const endpoint = isRegisterMode ? "/api/auth/register" : "/api/auth/login";
     const payload = isRegisterMode ? { name: document.getElementById("authName").value.trim(), email, password } : { email, password };
     try {
         const wasRegistering = isRegisterMode;
@@ -107,8 +107,8 @@ window.handleAddRecipe = async function(event) {
     const tips = document.getElementById("newRecipeTips").value.trim();
     if (ingredients.length < 3 || steps.length < 3) { showMessage("Bahan dan langkah masing-masing minimal 3 baris."); return; }
     try {
-        const result = await api("/api/recipes", { method: "POST", body: JSON.stringify({ name, region, subRegion, halalStatus, image, origin, ingredients, steps, tips }) });
-        closeAddRecipeModal(); showMessage(result.message + " Resep belum tampil sampai disetujui admin.");
+        const result = await api("/api/recipes/submit", { method: "POST", body: JSON.stringify({ recipe: { name, region, subRegion, halalStatus, image, origin, ingredients, steps, tips } }) });
+        closeAddRecipeModal(); showMessage("Resep berhasil dikirim dan menunggu persetujuan admin.");
     } catch (error) { showMessage(error.message); }
 };
 window.handleReviewSubmit = async function(event) {
@@ -133,7 +133,7 @@ window.calculateAverageRating = function(recipe) {
 };
 window.openModal = async function(id) {
     const recipe = recipes.find(r => r.id === id); if (!recipe) return;
-    try { const result = await api(`/api/recipes/${encodeURIComponent(id)}/reviews`); recipe.reviews = result.reviews; } catch (_) {}
+    try { const result = await api(`/api/recipes/${encodeURIComponent(id)}/reviews`); recipe.reviews = result.reviews.map(r => ({ ...r, userName: r.name })); } catch (_) {}
     baseOpenModal(id);
 };
 window.openProfileModal = async function() {
@@ -149,9 +149,15 @@ window.openProfileModal = async function() {
 async function loadAdminRecipes() {
     const box = document.getElementById("adminContent"); box.innerHTML = "Memuat resep...";
     try {
-        const { recipes: pending } = await api("/api/admin/recipes");
-        box.innerHTML = pending.length ? pending.map(r => `<article class="border border-orange-100 rounded-xl p-4"><div class="font-bold text-gray-800">${escapeHtml(r.name)}</div><p class="text-xs text-gray-500">${escapeHtml(r.region)} • ${escapeHtml(r.sub_region)} • ${escapeHtml(r.author)} (${escapeHtml(r.email)})</p><details class="my-3 text-xs"><summary class="cursor-pointer font-bold text-brand-600">Periksa isi resep</summary><p class="my-2">${escapeHtml(r.origin)}</p><b>Bahan:</b><ul class="list-disc pl-5">${JSON.parse(r.ingredients_json).map(x => `<li>${escapeHtml(x)}</li>`).join("")}</ul><b>Langkah:</b><ol class="list-decimal pl-5">${JSON.parse(r.steps_json).map(x => `<li>${escapeHtml(x)}</li>`).join("")}</ol><p class="mt-2">Tips: ${escapeHtml(r.tips)}</p></details><div class="flex gap-2 mt-3"><button data-id="${escapeHtml(r.id)}" data-status="approved" class="bg-emerald-600 text-white rounded-lg px-3 py-2 text-xs">Setujui</button><button data-id="${escapeHtml(r.id)}" data-status="rejected" class="bg-red-600 text-white rounded-lg px-3 py-2 text-xs">Tolak</button></div></article>`).join("") : '<p class="text-gray-500">Tidak ada resep yang menunggu persetujuan.</p>';
-        box.querySelectorAll("button[data-id]").forEach(button => button.onclick = async () => { try { await api(`/api/admin/recipes/${encodeURIComponent(button.dataset.id)}`, { method: "PATCH", body: JSON.stringify({ status: button.dataset.status }) }); loadAdminRecipes(); if (button.dataset.status === "approved") await loadCommunityRecipes(); } catch (e) { showMessage(e.message); } });
+        const { recipes: pending } = await api("/api/admin/recipes/pending");
+        box.innerHTML = pending.length ? pending.map(r => `<article class="border border-orange-100 rounded-xl p-4"><div class="font-bold text-gray-800">${escapeHtml(r.name)}</div><p class="text-xs text-gray-500">${escapeHtml(r.region)} • ${escapeHtml(r.subRegion || "")} • ${escapeHtml(r.submittedBy || "")} (${escapeHtml(r.submittedEmail || "")})</p><details class="my-3 text-xs"><summary class="cursor-pointer font-bold text-brand-600">Periksa isi resep</summary><p class="my-2">${escapeHtml(r.origin)}</p><b>Bahan:</b><ul class="list-disc pl-5">${(r.ingredients || []).map(x => `<li>${escapeHtml(x)}</li>`).join("")}</ul><b>Langkah:</b><ol class="list-decimal pl-5">${(r.steps || []).map(x => `<li>${escapeHtml(x)}</li>`).join("")}</ol><p class="mt-2">Tips: ${escapeHtml(r.tips)}</p></details><div class="flex gap-2 mt-3"><button data-id="${escapeHtml(r.submissionId)}" data-status="approve" class="bg-emerald-600 text-white rounded-lg px-3 py-2 text-xs">Setujui</button><button data-id="${escapeHtml(r.submissionId)}" data-status="reject" class="bg-red-600 text-white rounded-lg px-3 py-2 text-xs">Tolak</button></div></article>`).join("") : '<p class="text-gray-500">Tidak ada resep yang menunggu persetujuan.</p>';
+        box.querySelectorAll("button[data-id]").forEach(button => button.onclick = async () => {
+            try {
+                await api(`/api/admin/recipes/${encodeURIComponent(button.dataset.id)}/${button.dataset.status}`, { method: "POST" });
+                await loadAdminRecipes();
+                if (button.dataset.status === "approve") await loadCommunityRecipes();
+            } catch (e) { showMessage(e.message); }
+        });
     } catch (error) { box.textContent = error.message; }
 }
 async function loadAdminComplaints() {
@@ -168,7 +174,7 @@ async function loadAdminHistory() {
 }
 async function loadCommunityRecipes() {
     try {
-        const result = await api("/api/recipes");
+        const result = await api("/api/recipes/public");
         const safeRecipes = result.recipes.map(r => ({ ...r,
             name: escapeHtml(r.name), region: escapeHtml(r.region), subRegion: escapeHtml(r.subRegion),
             image: /^https:\/\//i.test(r.image || "") ? r.image : getSmartFoodImage(r.name, r.region),
