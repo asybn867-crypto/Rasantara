@@ -11,3 +11,6 @@ run_worker_first = ["/api/*"]
 binding = "DB"
 database_name = "rasantara-db"
 database_id = "34af0613-ff48-4f35-978c-6811897010ca"
+
+[triggers]
+crons = ["0 0 * * 1"]
