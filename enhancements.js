@@ -22,9 +22,6 @@
         body.rs-landscape #recipeGrid img {height:135px}
         body.rs-landscape header .max-w-7xl > .flex {align-items:flex-start}
       }
-      #rsOrientation {position:fixed;right:14px;bottom:14px;z-index:45;display:flex;gap:5px;padding:5px;background:#fff;border:1px solid #fed7aa;border-radius:999px;box-shadow:0 5px 22px #7c2d1230}
-      #rsOrientation button {border:0;border-radius:999px;padding:8px 11px;font-size:11px;font-weight:700;color:#9a3412;background:transparent}
-      #rsOrientation button[aria-pressed=true] {background:#f97316;color:white}
       #rsAdminModal {position:fixed;inset:0;z-index:90;background:#0009;display:none;align-items:center;justify-content:center;padding:14px}
       #rsAdminModal.open {display:flex}
       #rsAdminPanel {background:white;border-radius:22px;width:min(900px,100%);max-height:90vh;overflow:auto;padding:20px}
