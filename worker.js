@@ -42,7 +42,7 @@ if(path==="/images/upload"&&req.method==="POST"){
 if(path.startsWith("/images/")&&req.method==="GET"){
  if(!env.IMAGES)return new Response("Image storage is not configured.",{status:503,headers:cors});
  const key=path.slice("/images/".length);
- if(!/^recipes\\/[a-f0-9-]+\\.(jpg|png|webp|gif)$/.test(key))return new Response("Not found.",{status:404,headers:cors});
+ if(!/^recipes\/[a-f0-9-]+\.(jpg|png|webp|gif)$/.test(key))return new Response("Not found.",{status:404,headers:cors});
  const object=await env.IMAGES.get(key);if(!object)return new Response("Not found.",{status:404,headers:cors});
  const headers=new Headers(cors);object.writeHttpMetadata(headers);headers.set("etag",object.httpEtag);headers.set("Cache-Control","public, max-age=31536000, immutable");
  return new Response(object.body,{headers});
