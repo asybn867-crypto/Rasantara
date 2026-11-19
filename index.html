@@ -763,7 +763,7 @@
         ];
 
         let recipes = JSON.parse(localStorage.getItem('rasantara_recipes')) || defaultRecipes;
-        let currentUser = JSON.parse(localStorage.getItem('rasantara_current_user')) || null;
+        let currentUser = localStorage.getItem('rasantara_token') ? (JSON.parse(localStorage.getItem('rasantara_current_user')) || null) : null;
         let isRegisterMode = false;
         let currentCategory = 'all';
         let currentActiveRecipeId = null;
