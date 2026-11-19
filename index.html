@@ -411,7 +411,7 @@
 
             <div class="bg-gray-800/80 border border-gray-700 p-4 rounded-2xl max-w-xs mx-auto shadow-xl">
                 <div class="flex items-center justify-center gap-2 text-amber-400 mb-2 text-sm font-bold">
-                    <i class="fas fa-stopwatch text-base"></i> Timer Rekomendasi (5 Menit)
+                    <i class="fas fa-stopwatch text-base"></i> Timer Opsional (5 Menit)
                 </div>
                 <div id="timerDisplay" class="text-3xl font-mono font-bold text-white mb-3">05:00</div>
                 <div class="flex justify-center gap-2">
@@ -1494,6 +1494,87 @@
             } catch (err) {
                 alert(err.message);
             }
+        }
+
+        function startCookingMode() {
+            const recipe = recipes.find(item => item.id === currentActiveRecipeId);
+            if (!recipe || !Array.isArray(recipe.steps) || !recipe.steps.length) {
+                alert('Langkah memasak untuk resep ini belum tersedia.');
+                return;
+            }
+            currentCookingSteps = recipe.steps.filter(step => String(step).trim());
+            if (!currentCookingSteps.length) return;
+            currentStepIndex = 0;
+            document.getElementById('cookModeTitle').textContent = recipe.name;
+            document.getElementById('cookingModeModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            resetTimer();
+            renderCookingStep();
+        }
+
+        function renderCookingStep() {
+            const total = currentCookingSteps.length;
+            document.getElementById('currentStepNum').textContent = currentStepIndex + 1;
+            document.getElementById('totalStepNum').textContent = total;
+            document.getElementById('cookModeStepText').textContent = currentCookingSteps[currentStepIndex] || '';
+            const prev = document.getElementById('prevStepBtn');
+            const next = document.getElementById('nextStepBtn');
+            prev.disabled = currentStepIndex === 0;
+            next.innerHTML = currentStepIndex === total - 1
+                ? 'Selesai <i class="fas fa-check"></i>'
+                : 'Selanjutnya <i class="fas fa-arrow-right"></i>';
+        }
+
+        function prevCookingStep() {
+            if (currentStepIndex <= 0) return;
+            currentStepIndex--;
+            renderCookingStep();
+        }
+
+        function nextCookingStep() {
+            if (currentStepIndex < currentCookingSteps.length - 1) {
+                currentStepIndex++;
+                renderCookingStep();
+                return;
+            }
+            closeCookingMode();
+            alert('Mantap! Semua langkah memasak sudah selesai.');
+        }
+
+        function closeCookingMode() {
+            pauseTimer();
+            document.getElementById('cookingModeModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timerSeconds / 60);
+            const seconds = timerSeconds % 60;
+            document.getElementById('timerDisplay').textContent =
+                String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+        }
+
+        function startTimer() {
+            if (timerInterval || timerSeconds <= 0) return;
+            timerInterval = setInterval(() => {
+                timerSeconds = Math.max(0, timerSeconds - 1);
+                updateTimerDisplay();
+                if (timerSeconds === 0) {
+                    pauseTimer();
+                    alert('Waktu timer selesai!');
+                }
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = null;
+        }
+
+        function resetTimer() {
+            pauseTimer();
+            timerSeconds = 300;
+            updateTimerDisplay();
         }
 
         function openComplaintModal() {
