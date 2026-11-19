@@ -118,9 +118,9 @@ window.handleReviewSubmit = async function(event) {
     const rating = Number(document.getElementById("reviewRatingVal").value), comment = document.getElementById("reviewComment").value.trim();
     if (comment.length < 10) { showMessage("Ulasan minimal 10 karakter."); return; }
     try {
-        await api("/api/reviews", { method: "POST", body: JSON.stringify({ recipeId: recipe.id, rating, comment }) });
+        await api(`/api/recipes/${encodeURIComponent(recipe.id)}/reviews`, { method: "POST", body: JSON.stringify({ rating, comment }) });
         currentUser.points = (currentUser.points || 0) + 10; updateUserUI();
-        const list = await api(`/api/reviews?recipe_id=${encodeURIComponent(recipe.id)}`); recipe.reviews = list.reviews;
+        const list = await api(`/api/recipes/${encodeURIComponent(recipe.id)}/reviews`); recipe.reviews = list.reviews;
         document.getElementById("reviewComment").value = ""; setRatingInput(5);
         document.getElementById("modalRatingVal").innerText = calculateAverageRating(recipe);
         document.getElementById("modalReviewCount").innerText = recipe.reviews.length;
@@ -133,7 +133,7 @@ window.calculateAverageRating = function(recipe) {
 };
 window.openModal = async function(id) {
     const recipe = recipes.find(r => r.id === id); if (!recipe) return;
-    try { const result = await api(`/api/reviews?recipe_id=${encodeURIComponent(id)}`); recipe.reviews = result.reviews; } catch (_) {}
+    try { const result = await api(`/api/recipes/${encodeURIComponent(id)}/reviews`); recipe.reviews = result.reviews; } catch (_) {}
     baseOpenModal(id);
 };
 window.openProfileModal = async function() {
