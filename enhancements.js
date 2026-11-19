@@ -73,7 +73,7 @@
   }
   function escapeHtml(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
   function addAdminButton() {
-    const user=window.currentUser;
+    const user=typeof currentUser !== "undefined" ? currentUser : null;
     const account=document.getElementById("accountSection");
     if(!account || !user || user.role!=="admin" || document.getElementById("rsAdminOpen"))return;
     const b=document.createElement("button");
