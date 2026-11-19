@@ -125,12 +125,28 @@
   function addAdminButton() {
     const user=typeof currentUser !== "undefined" ? currentUser : null;
     const account=document.getElementById("accountSection");
-    if(!account || !user || user.role!=="admin" || document.getElementById("rsAdminOpen"))return;
-    const b=document.createElement("button");
-    b.id="rsAdminOpen";b.type="button";b.textContent="Panel Admin";
-    b.className="bg-white text-orange-700 font-bold px-4 py-3 rounded-full shadow text-sm";
-    b.onclick=()=>{document.getElementById("rsAdminModal").classList.add("open");loadAdminView("history")};
-    account.appendChild(b);
+    if(!account)return;
+    const existing=document.getElementById("rsAdminActions");
+    if(!user || user.role!=="admin") {
+      if(existing)existing.remove();
+      return;
+    }
+    if(existing)return;
+    const actions=document.createElement("div");
+    actions.id="rsAdminActions";
+    actions.className="flex items-center justify-center gap-2 flex-wrap";
+    const panel=document.createElement("button");
+    panel.id="rsAdminOpen";panel.type="button";panel.textContent="Panel Admin";
+    panel.className="bg-white text-orange-700 hover:bg-orange-50 font-bold px-4 py-3 rounded-full shadow text-sm whitespace-nowrap";
+    panel.onclick=()=>{document.getElementById("rsAdminModal").classList.add("open");loadAdminView("history")};
+    const logout=document.createElement("button");
+    logout.id="rsAdminLogout";logout.type="button";logout.textContent="Keluar dari Admin";
+    logout.className="bg-orange-900/30 hover:bg-orange-900/50 text-white border border-white/30 font-bold px-4 py-3 rounded-full text-sm whitespace-nowrap";
+    logout.onclick=()=>{if(typeof handleLogout==="function")handleLogout()};
+    actions.append(panel,logout);
+    account.parentNode.insertBefore(actions,account);
+    const oldLogout=document.querySelector('#userProfileNav button[onclick="handleLogout()"]');
+    if(oldLogout)oldLogout.style.display="none";
   }
   function watchUser() {
     const originalUpdate = window.updateUserUI;
