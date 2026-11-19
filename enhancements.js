@@ -53,10 +53,16 @@
     if (document.getElementById("rsAdminModal")) return;
     const modal = document.createElement("div");
     modal.id = "rsAdminModal";
-    modal.innerHTML = '<section id="rsAdminPanel"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><div><h2 style="font:700 22px Georgia;color:#292524">Panel Admin Rasantara</h2><p style="font-size:12px;color:#78716c">Data tersimpan di Cloudflare D1.</p></div><button id="rsAdminClose" aria-label="Tutup" style="font-size:24px;color:#78716c">×</button></div><nav class="rs-admin-tabs"><button data-view="history">Riwayat Login</button><button data-view="complaints">Komplain Masuk</button><button data-view="pending">Persetujuan Resep</button></nav><div id="rsAdminContent">Pilih menu.</div></section>';
+    modal.innerHTML = '<section id="rsAdminPanel"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><div><h2 style="font:700 22px Georgia;color:#292524">Panel Admin Rasantara</h2><p style="font-size:12px;color:#78716c">Data tersimpan di Cloudflare D1.</p></div><button id="rsAdminClose" aria-label="Tutup" style="font-size:24px;color:#78716c">×</button></div><nav class="rs-admin-tabs"><button data-view="history">Riwayat Login</button><button data-view="complaints">Komplain Masuk</button><button data-view="pending">Persetujuan Resep</button><button data-view="recipes">Kelola Resep</button><button data-view="users">Kelola Akun</button></nav><div id="rsAdminContent">Pilih menu.</div></section>';
     document.body.appendChild(modal);
     modal.addEventListener("click", e => {if(e.target===modal || e.target.id==="rsAdminClose")modal.classList.remove("open")});
     modal.querySelectorAll("[data-view]").forEach(b=>b.addEventListener("click",()=>loadAdminView(b.dataset.view)));
+    modal.addEventListener("click",async e=>{
+      const del=e.target.closest("[data-delete]"),ban=e.target.closest("[data-ban]"),unban=e.target.closest("[data-unban]");
+      if(del){if(!confirm("Hapus resep ini secara permanen?"))return;del.disabled=true;try{await request("/admin/recipes/"+encodeURIComponent(del.dataset.delete),{method:"DELETE"});await loadAdminView("recipes");}catch(err){alert(err.message);del.disabled=false;}return;}
+      if(ban){const reason=prompt("Alasan pemblokiran akun:");if(reason===null)return;ban.disabled=true;try{await request("/admin/users/"+encodeURIComponent(ban.dataset.ban)+"/ban",{method:"POST",body:JSON.stringify({reason})});await loadAdminView("users");}catch(err){alert(err.message);ban.disabled=false;}return;}
+      if(unban){unban.disabled=true;try{await request("/admin/users/"+encodeURIComponent(unban.dataset.unban)+"/unban",{method:"POST",body:"{}"});await loadAdminView("users");}catch(err){alert(err.message);unban.disabled=false;}return;}
+    });
     modal.addEventListener("click",async e=>{
       const approve=e.target.closest("[data-approve]"),reject=e.target.closest("[data-reject]"),btn=approve||reject;
       if(!btn)return;
@@ -71,7 +77,13 @@
     const box=document.getElementById("rsAdminContent");
     box.textContent="Memuat data...";
     try {
-      if(view==="pending") {
+      if(view==="users") {
+        const data=await request("/admin/users");
+        box.innerHTML=data.users.length?data.users.map(u=>'<article class="rs-admin-entry"><b>'+escapeHtml(u.name)+'</b><div style="color:#78716c;font-size:11px;margin:4px 0">'+escapeHtml(u.email)+' · '+escapeHtml(u.role)+'</div><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><span style="color:'+(u.banned_at?'#dc2626':'#15803d')+'">'+(u.banned_at?'Diblokir: '+escapeHtml(u.ban_reason||'-'):'Aktif')+'</span>'+(u.role==='admin'?'':'<button '+(u.banned_at?'data-unban="'+escapeHtml(u.id)+'"':'data-ban="'+escapeHtml(u.id)+'"')+' style="background:'+(u.banned_at?'#15803d':'#dc2626')+';color:white;padding:7px 11px;border-radius:8px;font-weight:700">'+(u.banned_at?'Buka blokir':'Ban akun')+'</button>')+'</div></article>').join(""):'<p>Belum ada akun.</p>';
+      } else if(view==="recipes") {
+        const data=await request("/admin/recipes");
+        box.innerHTML=data.recipes.length?data.recipes.map(r=>'<article class="rs-admin-entry"><b>'+escapeHtml(r.name)+'</b><div style="color:#78716c;font-size:11px;margin:4px 0">Status: '+escapeHtml(r.status)+' · '+new Date(Number(r.submittedAt)).toLocaleString("id-ID")+'</div><p>'+escapeHtml(r.origin||"")+'</p><button data-delete="'+escapeHtml(r.submissionId)+'" style="background:#dc2626;color:white;padding:8px 12px;border-radius:9px;font-weight:700">Hapus resep</button></article>').join(""):'<p>Belum ada resep komunitas.</p>';
+      } else if(view==="pending") {
         const data=await request("/admin/recipes/pending");
         box.innerHTML=data.recipes.length?data.recipes.map(r=>'<article class="rs-admin-entry"><b>'+escapeHtml(r.name)+'</b><div style="color:#78716c;font-size:11px;margin:4px 0">'+escapeHtml(r.subRegion)+' · oleh '+escapeHtml(r.submittedBy)+' ('+escapeHtml(r.submittedEmail)+')</div><p style="margin:7px 0">'+escapeHtml(r.origin)+'</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button data-approve="'+escapeHtml(r.submissionId)+'" style="background:#15803d;color:white;padding:8px 12px;border-radius:9px;font-weight:700">Setujui & Publikasikan</button><button data-reject="'+escapeHtml(r.submissionId)+'" style="background:#dc2626;color:white;padding:8px 12px;border-radius:9px;font-weight:700">Tolak</button></div></article>').join(""):'<p style="color:#78716c;font-size:13px">Tidak ada resep yang menunggu persetujuan.</p>';
       } else if(view==="history") {
