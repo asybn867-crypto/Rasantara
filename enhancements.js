@@ -1,8 +1,8 @@
 (() => {
   const API = "https://rasantara-api.asybn867.workers.dev/api";
   const token = () => localStorage.getItem("rasantara_token");
-  async function request(path) {
-    const res = await fetch(API + path, {headers: {Authorization: "Bearer " + (token() || "")}});
+  async function request(path, options = {}) {
+    const res = await fetch(API + path, {...options, headers: {"Content-Type":"application/json", Authorization: "Bearer " + (token() || ""), ...(options.headers || {})}});
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.error || "Permintaan gagal.");
     return data;
@@ -53,16 +53,28 @@
     if (document.getElementById("rsAdminModal")) return;
     const modal = document.createElement("div");
     modal.id = "rsAdminModal";
-    modal.innerHTML = '<section id="rsAdminPanel"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><div><h2 style="font:700 22px Georgia;color:#292524">Panel Admin Rasantara</h2><p style="font-size:12px;color:#78716c">Data tersimpan di Cloudflare D1.</p></div><button id="rsAdminClose" aria-label="Tutup" style="font-size:24px;color:#78716c">×</button></div><nav class="rs-admin-tabs"><button data-view="history">Riwayat Login</button><button data-view="complaints">Komplain Masuk</button></nav><div id="rsAdminContent">Pilih menu.</div></section>';
+    modal.innerHTML = '<section id="rsAdminPanel"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><div><h2 style="font:700 22px Georgia;color:#292524">Panel Admin Rasantara</h2><p style="font-size:12px;color:#78716c">Data tersimpan di Cloudflare D1.</p></div><button id="rsAdminClose" aria-label="Tutup" style="font-size:24px;color:#78716c">×</button></div><nav class="rs-admin-tabs"><button data-view="history">Riwayat Login</button><button data-view="complaints">Komplain Masuk</button><button data-view="pending">Persetujuan Resep</button></nav><div id="rsAdminContent">Pilih menu.</div></section>';
     document.body.appendChild(modal);
     modal.addEventListener("click", e => {if(e.target===modal || e.target.id==="rsAdminClose")modal.classList.remove("open")});
     modal.querySelectorAll("[data-view]").forEach(b=>b.addEventListener("click",()=>loadAdminView(b.dataset.view)));
+    modal.addEventListener("click",async e=>{
+      const approve=e.target.closest("[data-approve]"),reject=e.target.closest("[data-reject]"),btn=approve||reject;
+      if(!btn)return;
+      const id=btn.dataset.approve||btn.dataset.reject;
+      if(!confirm(approve?"Publikasikan resep ini?":"Tolak kiriman resep ini?"))return;
+      btn.disabled=true;
+      try{await request("/admin/recipes/"+encodeURIComponent(id)+(approve?"/approve":"/reject"),{method:"POST",body:"{}"});await loadAdminView("pending");if(approve&&typeof window.loadApprovedCommunityRecipes==="function")await window.loadApprovedCommunityRecipes();}
+      catch(err){alert(err.message);btn.disabled=false;}
+    });
   }
   async function loadAdminView(view) {
     const box=document.getElementById("rsAdminContent");
     box.textContent="Memuat data...";
     try {
-      if(view==="history") {
+      if(view==="pending") {
+        const data=await request("/admin/recipes/pending");
+        box.innerHTML=data.recipes.length?data.recipes.map(r=>'<article class="rs-admin-entry"><b>'+escapeHtml(r.name)+'</b><div style="color:#78716c;font-size:11px;margin:4px 0">'+escapeHtml(r.subRegion)+' · oleh '+escapeHtml(r.submittedBy)+' ('+escapeHtml(r.submittedEmail)+')</div><p style="margin:7px 0">'+escapeHtml(r.origin)+'</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button data-approve="'+escapeHtml(r.submissionId)+'" style="background:#15803d;color:white;padding:8px 12px;border-radius:9px;font-weight:700">Setujui & Publikasikan</button><button data-reject="'+escapeHtml(r.submissionId)+'" style="background:#dc2626;color:white;padding:8px 12px;border-radius:9px;font-weight:700">Tolak</button></div></article>').join(""):'<p style="color:#78716c;font-size:13px">Tidak ada resep yang menunggu persetujuan.</p>';
+      } else if(view==="history") {
         const data=await request("/admin/login-history");
         box.innerHTML=data.history.length?data.history.map(r=>'<article class="rs-admin-entry"><b>'+escapeHtml(r.email)+'</b><div style="display:flex;justify-content:space-between;gap:12px;margin-top:5px"><span style="color:'+(r.success?'#047857':'#dc2626')+'">'+(r.success?'Login berhasil':'Login gagal')+'</span><span style="color:#78716c">'+new Date(Number(r.created_at)).toLocaleString("id-ID")+'</span></div></article>').join(""):'<p style="color:#78716c;font-size:13px">Belum ada riwayat login.</p>';
       } else {
