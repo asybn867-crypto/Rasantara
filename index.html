@@ -303,12 +303,16 @@
                 <i class="fas fa-times"></i>
             </button>
             
+            <div class="grid grid-cols-2 gap-2 mb-5">
+                <button type="button" id="customerAuthTab" onclick="setAuthRole('user')" class="py-2.5 rounded-xl bg-orange-500 text-white font-bold text-sm">Login Pelanggan</button>
+                <button type="button" id="adminAuthTab" onclick="setAuthRole('admin')" class="py-2.5 rounded-xl bg-gray-100 text-gray-600 font-bold text-sm">Login Admin</button>
+            </div>
             <div class="text-center mb-6">
                 <div class="w-14 h-14 bg-orange-100 text-brand-500 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl shadow-inner">
                     <i class="fas fa-user-circle"></i>
                 </div>
                 <h3 class="text-xl font-bold font-serif text-gray-800" id="authTitle">Masuk ke Rasantara</h3>
-                <p class="text-xs text-gray-500 mt-1">Kumpulkan poin kontributor dan bangun reputasi memasak Anda</p>
+                <p class="text-xs text-gray-500 mt-1" id="authSubtitle">Masuk atau daftar sebagai pelanggan Rasantara.</p>
             </div>
 
             <form onsubmit="handleAuthSubmit(event)" class="space-y-4">
@@ -333,7 +337,7 @@
                 </button>
             </form>
 
-            <div class="mt-4 text-center text-xs text-gray-500">
+            <div class="mt-4 text-center text-xs text-gray-500" id="authToggleWrap">
                 <span id="authToggleText">Belum punya akun?</span>
                 <button type="button" onclick="toggleAuthMode()" class="text-brand-600 font-bold hover:underline ml-1" id="authToggleBtn">Buat Akun Baru</button>
             </div>
@@ -735,6 +739,7 @@
         let ratingSummaryCache = {};
         let currentUser = localStorage.getItem('rasantara_token') ? (JSON.parse(localStorage.getItem('rasantara_current_user')) || null) : null;
         let isRegisterMode = false;
+        let authRole = "user";
         let currentCategory = 'all';
         let currentActiveRecipeId = null;
         let currentPortion = 4;
@@ -800,7 +805,19 @@
         }
 
         function openAuthModal() {
+            setAuthRole("user");
             document.getElementById('authModal').classList.remove('hidden');
+        }
+
+        function setAuthRole(role) {
+            authRole = role === "admin" ? "admin" : "user";
+            isRegisterMode = false;
+            const admin = authRole === "admin";
+            document.getElementById("customerAuthTab").className = "py-2.5 rounded-xl font-bold text-sm " + (!admin ? "bg-orange-500 text-white" : "bg-gray-100 text-gray-600");
+            document.getElementById("adminAuthTab").className = "py-2.5 rounded-xl font-bold text-sm " + (admin ? "bg-orange-500 text-white" : "bg-gray-100 text-gray-600");
+            document.getElementById("authSubtitle").innerText = admin ? "Khusus administrator Rasantara. Akun pelanggan tidak bisa masuk di sini." : "Masuk atau daftar sebagai pelanggan Rasantara.";
+            document.getElementById("authToggleWrap").classList.toggle("hidden", admin);
+            updateAuthModalUI();
         }
 
         function closeAuthModal() {
@@ -815,6 +832,14 @@
         }
 
         function updateAuthModalUI() {
+            if (authRole === "admin") {
+                document.getElementById("authTitle").innerText = "Login Admin Rasantara";
+                document.getElementById("nameFieldContainer").classList.add("hidden");
+                document.getElementById("authName").required = false;
+                document.getElementById("authSubmitBtn").innerText = "Masuk sebagai Admin";
+                document.getElementById("authToggleWrap").classList.add("hidden");
+                return;
+            }
             const title = document.getElementById('authTitle');
             const nameField = document.getElementById('nameFieldContainer');
             const submitBtn = document.getElementById('authSubmitBtn');
@@ -859,6 +884,8 @@
                 const data = await response.json().catch(() => ({}));
                 if (!response.ok) throw new Error(data.detail ? (data.error + ' (' + data.detail + ')') : (data.error || 'Autentikasi gagal.'));
                 if (!data.token || !data.user) throw new Error('Respons server tidak lengkap.');
+                if (authRole === "admin" && data.user.role !== "admin") throw new Error("Akun ini bukan administrator. Gunakan Login Pelanggan.");
+                if (authRole === "user" && data.user.role === "admin") throw new Error("Akun administrator harus masuk melalui Login Admin.");
                 localStorage.setItem('rasantara_token', data.token);
                 currentUser = {...data.user, favorites: [], points: 0};
                 localStorage.setItem('rasantara_current_user', JSON.stringify(currentUser));
