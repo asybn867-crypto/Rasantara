@@ -237,13 +237,6 @@
                     <ul id="modalIngredients" class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-700"></ul>
                 </div>
 
-                <div class="bg-orange-50/70 border border-orange-100 rounded-2xl p-4">
-                    <div class="mb-3">
-                        <h3 class="text-base font-bold text-brand-700 flex items-center gap-2"><i class="fas fa-shopping-basket"></i> Daftar Belanja</h3>
-                        <p class="text-xs text-gray-500 mt-1">Centang bahan yang sudah kamu beli. Jumlah mengikuti porsi di atas.</p>
-                    </div>
-                    <ul id="modalShoppingList" class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-700"></ul>
-                </div>
 
                 <div>
                     <h3 class="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2 border-b border-gray-100 pb-2">
@@ -1202,25 +1195,13 @@
         function renderIngredientsList(recipe) {
             const multiplier = currentPortion / basePortion;
             const ingContainer = document.getElementById('modalIngredients');
-            const shoppingContainer = document.getElementById('modalShoppingList');
             ingContainer.innerHTML = '';
-            shoppingContainer.innerHTML = '';
 
-            recipe.ingredients.forEach((item, index) => {
-                const scaledItem = scaleIngredientText(item, multiplier);
-
+            recipe.ingredients.forEach(item => {
                 const ingredient = document.createElement('li');
                 ingredient.className = "bg-gray-50 p-2 rounded-lg border border-gray-100 leading-relaxed";
-                ingredient.textContent = scaledItem;
+                ingredient.textContent = scaleIngredientText(item, multiplier);
                 ingContainer.appendChild(ingredient);
-
-                const shoppingItem = document.createElement('li');
-                shoppingItem.className = "flex items-start gap-2 bg-white p-2 rounded-lg border border-orange-100";
-                shoppingItem.innerHTML = `
-                    <input type="checkbox" id="shop-${index}" class="mt-1 accent-brand-500 h-4 w-4 rounded cursor-pointer">
-                    <label for="shop-${index}" class="cursor-pointer select-none leading-tight text-gray-700">${scaledItem}</label>
-                `;
-                shoppingContainer.appendChild(shoppingItem);
             });
         }
 
