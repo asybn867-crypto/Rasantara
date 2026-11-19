@@ -22,12 +22,37 @@
         body.rs-landscape #recipeGrid img {height:135px}
         body.rs-landscape header .max-w-7xl > .flex {align-items:flex-start}
       }
-      #rsAdminModal {position:fixed;inset:0;z-index:90;background:#0009;display:none;align-items:center;justify-content:center;padding:14px}
-      #rsAdminModal.open {display:flex}
-      #rsAdminPanel {background:white;border-radius:22px;width:min(900px,100%);max-height:90vh;overflow:auto;padding:20px}
-      .rs-admin-tabs {display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
-      .rs-admin-tabs button {background:#ffedd5;color:#9a3412;padding:9px 13px;border-radius:12px;font-size:12px;font-weight:700}
-      .rs-admin-entry {border:1px solid #fed7aa;border-radius:14px;padding:13px;margin:9px 0;font-size:13px}
+      #rsAdminModal{position:fixed;inset:0;z-index:90;background:rgba(28,20,15,.58);backdrop-filter:blur(7px);display:none;align-items:center;justify-content:center;padding:clamp(8px,2vw,24px)}
+      #rsAdminModal.open{display:flex}
+      #rsAdminPanel{width:min(1180px,100%);height:min(820px,94dvh);min-height:520px;background:#faf8f5;border:1px solid #eadfd3;border-radius:24px;overflow:hidden;display:grid;grid-template-columns:238px minmax(0,1fr);box-shadow:0 28px 90px #1c140f55;color:#29231f}
+      .rs-admin-side{background:#29231f;color:#f9f4ed;padding:24px 15px;display:flex;flex-direction:column;gap:26px}
+      .rs-admin-brand{display:flex;align-items:center;gap:11px;padding:0 8px}
+      .rs-admin-brandmark{width:39px;height:39px;border-radius:13px;background:#d97736;color:white;display:grid;place-items:center;font:700 20px Georgia}
+      .rs-admin-brand strong{display:block;font:700 19px Georgia;letter-spacing:.2px}
+      .rs-admin-brand small{display:block;color:#b9a99b;font-size:10px;letter-spacing:1.4px;text-transform:uppercase;margin-top:3px}
+      .rs-admin-navlabel{padding:0 10px;color:#9e8f82;font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}
+      .rs-admin-tabs{display:grid;gap:6px;margin-top:-17px}
+      .rs-admin-tabs button{width:100%;display:flex;align-items:center;gap:11px;text-align:left;background:transparent;color:#cfc2b7;padding:12px 13px;border-radius:12px;font-size:12px;font-weight:650;transition:.18s}
+      .rs-admin-tabs button:before{content:attr(data-icon);width:18px;text-align:center;font-size:15px}
+      .rs-admin-tabs button:hover{background:#ffffff12;color:white}
+      .rs-admin-tabs button.active{background:#d97736;color:white;box-shadow:0 5px 16px #d9773638}
+      .rs-admin-sidefoot{margin-top:auto;border-top:1px solid #ffffff18;padding:15px 9px 0;color:#aa9b8e;font-size:11px;line-height:1.6}
+      .rs-admin-main{min-width:0;display:flex;flex-direction:column;overflow:hidden}
+      .rs-admin-top{height:76px;flex:none;background:#fff;border-bottom:1px solid #eee5dc;display:flex;align-items:center;justify-content:space-between;padding:0 28px;gap:14px}
+      .rs-admin-top small{display:block;color:#9b8b7c;font-size:10px;letter-spacing:1.2px;text-transform:uppercase;font-weight:800}
+      .rs-admin-top strong{display:block;font:700 19px Georgia;margin-top:3px}
+      #rsAdminClose{width:36px;height:36px;border-radius:11px;background:#f5f0ea;color:#76685d;font-size:22px;display:grid;place-items:center}
+      #rsAdminClose:hover{background:#eee2d6;color:#29231f}
+      .rs-admin-work{overflow:auto;padding:26px 28px 34px}
+      .rs-admin-welcome{margin-bottom:22px}
+      .rs-admin-welcome h3{font:700 25px Georgia;color:#302820;margin:0 0 6px}
+      .rs-admin-welcome p{color:#88796c;font-size:12px;margin:0}
+      .rs-admin-entry{background:#fff;border:1px solid #eee3d8;border-radius:16px;padding:17px;margin:11px 0;font-size:13px;box-shadow:0 3px 12px #39241408}
+      .rs-admin-entry button{transition:.15s}
+      .rs-admin-entry button:hover{filter:brightness(.94);transform:translateY(-1px)}
+      .rs-admin-empty{background:white;border:1px dashed #dfcfc0;border-radius:18px;padding:34px 18px;text-align:center;color:#8e7e70;font-size:13px}
+      @media(max-width:700px){#rsAdminPanel{height:96dvh;min-height:0;grid-template-columns:68px minmax(0,1fr);border-radius:17px}.rs-admin-side{padding:17px 7px;gap:22px;align-items:center}.rs-admin-brand{padding:0}.rs-admin-brandmark{width:42px;height:42px}.rs-admin-brandtext,.rs-admin-navlabel,.rs-admin-sidefoot,.rs-admin-tabs button span{display:none}.rs-admin-tabs{width:100%;gap:8px}.rs-admin-tabs button{justify-content:center;padding:13px 3px;font-size:0}.rs-admin-tabs button:before{font-size:17px}.rs-admin-top{height:66px;padding:0 15px}.rs-admin-top strong{font-size:16px}.rs-admin-work{padding:20px 13px}.rs-admin-welcome h3{font-size:22px}}
+      @media(max-width:380px){#rsAdminPanel{grid-template-columns:56px minmax(0,1fr)}.rs-admin-side{padding-inline:5px}.rs-admin-work{padding-inline:10px}}
     `;
     document.head.appendChild(style);
   }
@@ -44,10 +69,10 @@
     if (document.getElementById("rsAdminModal")) return;
     const modal = document.createElement("div");
     modal.id = "rsAdminModal";
-    modal.innerHTML = '<section id="rsAdminPanel"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><div><h2 style="font:700 22px Georgia;color:#292524">Panel Admin Rasantara</h2><p style="font-size:12px;color:#78716c">Data tersimpan di Cloudflare D1.</p></div><button id="rsAdminClose" aria-label="Tutup" style="font-size:24px;color:#78716c">×</button></div><nav class="rs-admin-tabs"><button data-view="history">Riwayat Login</button><button data-view="complaints">Komplain Masuk</button><button data-view="pending">Persetujuan Resep</button><button data-view="recipes">Kelola Resep</button><button data-view="users">Kelola Akun</button><button data-view="comments">Moderasi Komentar</button></nav><div id="rsAdminContent">Pilih menu.</div></section>';
+    modal.innerHTML = '<section id="rsAdminPanel"><aside class="rs-admin-side"><div class="rs-admin-brand"><div class="rs-admin-brandmark">R</div><div class="rs-admin-brandtext"><strong>Rasantara</strong><small>Admin workspace</small></div></div><div class="rs-admin-navlabel">MENU UTAMA</div><nav class="rs-admin-tabs"><button data-view="history" data-icon="◷"><span>Riwayat Login</span></button><button data-view="complaints" data-icon="▤"><span>Komplain Masuk</span></button><button data-view="pending" data-icon="◈"><span>Persetujuan Resep</span></button><button data-view="recipes" data-icon="▧"><span>Kelola Resep</span></button><button data-view="users" data-icon="♙"><span>Kelola Akun</span></button><button data-view="comments" data-icon="☷"><span>Moderasi Komentar</span></button></nav><div class="rs-admin-sidefoot">RASANTARA CONTROL CENTER<br>Data dikelola melalui Cloudflare D1</div></aside><div class="rs-admin-main"><header class="rs-admin-top"><div><small>RASANTARA / ADMIN</small><strong id="rsAdminPageTitle">Ringkasan Aktivitas</strong></div><button id="rsAdminClose" aria-label="Tutup">×</button></header><main class="rs-admin-work"><div class="rs-admin-welcome"><h3 id="rsAdminHeading">Selamat datang, Admin.</h3><p>Kelola aktivitas dan konten komunitas Rasantara dari satu tempat.</p></div><div id="rsAdminContent"><div class="rs-admin-empty">Pilih menu di sebelah kiri untuk mulai mengelola.</div></div></main></div></section>';
     document.body.appendChild(modal);
     modal.addEventListener("click", e => {if(e.target===modal || e.target.id==="rsAdminClose")modal.classList.remove("open")});
-    modal.querySelectorAll("[data-view]").forEach(b=>b.addEventListener("click",()=>loadAdminView(b.dataset.view)));
+    modal.querySelectorAll("[data-view]").forEach(b=>b.addEventListener("click",()=>{modal.querySelectorAll("[data-view]").forEach(x=>x.classList.toggle("active",x===b));loadAdminView(b.dataset.view)}));
     modal.addEventListener("click",async e=>{
       const delComment=e.target.closest("[data-delete-comment]");
       if(delComment){if(!confirm("Hapus komentar ini secara permanen?"))return;delComment.disabled=true;try{await request("/admin/comments/"+encodeURIComponent(delComment.dataset.deleteComment),{method:"DELETE"});await loadAdminView("comments");}catch(err){alert(err.message);delComment.disabled=false;}return;}
@@ -68,7 +93,12 @@
   }
   async function loadAdminView(view) {
     const box=document.getElementById("rsAdminContent");
-    box.textContent="Memuat data...";
+    const titles={history:"Riwayat Login",complaints:"Komplain Masuk",pending:"Persetujuan Resep",recipes:"Kelola Resep",users:"Kelola Akun",comments:"Moderasi Komentar"};
+    const title=titles[view]||"Panel Admin";
+    const titleEl=document.getElementById("rsAdminPageTitle"),heading=document.getElementById("rsAdminHeading");
+    if(titleEl)titleEl.textContent=title;
+    if(heading)heading.textContent=title;
+    box.innerHTML='<div class="rs-admin-empty">Memuat data...</div>';
     try {
       if(view==="comments") {
         const data=await request("/admin/comments");
