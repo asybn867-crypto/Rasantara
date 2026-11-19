@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rasantara - Resep Makanan Nusantara</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Inter & Playfair Display -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { brand: { 50: '#FFF7ED', 100: '#FFEDD5', 500: '#FF7A00', 600: '#EA580C', 700: '#C2410C', accent: '#FF9500' } },
+                    fontFamily: { sans: ['Inter', 'sans-serif'], serif: ['Playfair Display', 'serif'] }
+                }
+            }
+        };
+    </script>
+    <style>
+        html { scroll-behavior: smooth; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #FFF7ED; }
+        ::-webkit-scrollbar-thumb { background: #FFB74D; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #FF7A00; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-orange-50/40 text-gray-800 font-sans min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-white">
+
+    <!-- HEADER / HERO SECTION -->
+    <header class="bg-gradient-to-r from-orange-500 via-brand-500 to-amber-500 text-white shadow-xl relative overflow-hidden">
+        <div class="absolute -top-10 -right-10 w-60 h-60 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+        <div class="absolute -bottom-10 -left-10 w-60 h-60 bg-black/10 rounded-full blur-xl pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 relative z-10">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                
+                <!-- Logo & Brand Info -->
+                <div class="flex items-center gap-5 text-center md:text-left">
+                    <div class="relative group">
+                        <div class="w-20 h-20 md:w-24 md:h-24 rounded-full bg-white p-1.5 shadow-2xl ring-4 ring-white/30 transform transition duration-300 group-hover:scale-105 flex items-center justify-center overflow-hidden">
+                            <svg viewBox="0 0 200 200" class="w-full h-full">
+                                <circle cx="100" cy="100" r="95" fill="#FFF7ED" stroke="#FF7A00" stroke-width="4"/>
+                                <circle cx="100" cy="100" r="82" fill="none" stroke="#FF9500" stroke-width="2" stroke-dasharray="6,4"/>
+                                <polygon points="100,35 145,135 55,135" fill="#FF9500"/>
+                                <polygon points="100,35 125,135 75,135" fill="#FF7A00"/>
+                                <ellipse cx="100" cy="135" rx="50" ry="12" fill="#D97706"/>
+                                <path d="M40 140 Q 60 120 80 140 Q 100 120 120 140 Q 140 120 160 140 Q 100 170 40 140 Z" fill="#15803D"/>
+                                <path d="M 65 110 Q 55 90 45 95" stroke="#DC2626" stroke-width="5" stroke-linecap="round" fill="none"/>
+                                <polygon points="100,15 104,25 100,30 96,25" fill="#B45309"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-center md:justify-start gap-2">
+                            <h1 class="text-3xl md:text-5xl font-extrabold font-serif tracking-tight drop-shadow-md">Rasantara</h1>
+                            <span class="bg-white/20 text-xs px-2.5 py-1 rounded-full uppercase tracking-wider font-semibold border border-white/30">Nusantara</span>
+                        </div>
+                        <p class="text-orange-100 mt-1.5 text-sm md:text-base font-medium max-w-md">
+                            Jelajah Cita Rasa Resep Kuliner Autentik Nusantara
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Action Bar & User Account Section -->
+                <div class="w-full md:w-auto flex flex-col sm:flex-row items-center gap-3">
+                    <div class="w-full sm:w-60 relative">
+                        <input type="text" id="searchInput" onkeyup="filterRecipes()" placeholder="Cari resep atau bahan..." 
+                            class="w-full pl-11 pr-4 py-3 rounded-full text-gray-800 bg-white shadow-lg focus:outline-none focus:ring-4 focus:ring-orange-300 transition duration-200 placeholder-gray-400 text-sm font-medium">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-brand-500">
+                            <i class="fas fa-search text-lg"></i>
+                        </div>
+                    </div>
+
+                    <button onclick="openAddRecipeModal()" class="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white font-bold px-4 py-3 rounded-full shadow transition duration-200 flex items-center justify-center gap-2 text-sm whitespace-nowrap border border-white/30">
+                        <i class="fas fa-plus-circle text-base"></i> Tambah Resep
+                    </button>
+                    <button onclick="document.getElementById('communitySection').scrollIntoView({behavior:'smooth'})" class="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white font-bold px-4 py-3 rounded-full shadow transition duration-200 flex items-center justify-center gap-2 text-sm whitespace-nowrap border border-white/30">
+                        <i class="fas fa-users"></i> Komunitas
+                    </button>
+                    <button onclick="openComplaintModal()" class="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white font-bold px-4 py-3 rounded-full shadow transition duration-200 flex items-center justify-center gap-2 text-sm whitespace-nowrap border border-white/30">
+                        <i class="fas fa-headset"></i> Komplain
+                    </button>
+
+                    <div id="accountSection">
+                        <button onclick="openAuthModal()" id="loginBtnNav" class="w-full sm:w-auto bg-white text-brand-600 hover:bg-orange-50 font-bold px-5 py-3 rounded-full shadow-lg transition duration-200 flex items-center justify-center gap-2 text-sm whitespace-nowrap">
+                            <i class="fas fa-user-circle text-brand-500 text-base"></i> Masuk / Daftar
+                        </button>
+                        <div id="userProfileNav" class="hidden items-center gap-3 bg-white/10 border border-white/30 px-4 py-2 rounded-full backdrop-blur-md">
+                            <div class="w-8 h-8 rounded-full bg-white text-brand-600 font-bold flex items-center justify-center text-sm shadow" id="userInitial">U</div>
+                            <div class="text-left hidden sm:block">
+                                <p class="text-xs font-bold leading-tight truncate max-w-[100px]" id="userNameDisplay">User</p>
+                                <button onclick="openProfileModal()" class="text-[10px] text-orange-200 hover:underline"><span id="userPointsDisplay">0</span> Poin • Profil</button>
+                            </div>
+                            <button onclick="handleLogout()" title="Keluar Akun" class="text-orange-200 hover:text-white ml-2">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
+        
+        <!-- CATEGORY NAVIGATION / TABS -->
+        <section class="mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                    <i class="fas fa-map-marked-alt text-brand-500"></i> Kategori Daerah & Favorit
+                </h2>
+                <span id="recipeCount" class="text-xs font-semibold text-brand-600 bg-brand-100 px-3 py-1 rounded-full">Resep Tersedia</span>
+            </div>
+
+            <div class="flex items-center gap-2 overflow-x-auto pb-3 pt-1 no-scrollbar">
+                <button onclick="selectCategory('all')" id="tab-all" class="category-tab px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition duration-200 bg-brand-500 text-white shadow-md hover:bg-brand-600 flex items-center gap-2">
+                    <i class="fas fa-globe-asia"></i> Semua Daerah
+                </button>
+                <button onclick="selectCategory('favorites')" id="tab-favorites" class="category-tab px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition duration-200 bg-white text-gray-600 hover:bg-orange-100 hover:text-brand-600 shadow-sm border border-orange-100 flex items-center gap-2">
+                    <i class="fas fa-heart text-red-500"></i> Favorit Saya (<span id="favCount">0</span>)
+                </button>
+                <button onclick="selectCategory('Sumatera')" id="tab-Sumatera" class="category-tab px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition duration-200 bg-white text-gray-600 hover:bg-orange-100 hover:text-brand-600 shadow-sm border border-orange-100 flex items-center gap-2">
+                    <i class="fas fa-mountain"></i> Sumatera
+                </button>
+                <button onclick="selectCategory('Jawa')" id="tab-Jawa" class="category-tab px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition duration-200 bg-white text-gray-600 hover:bg-orange-100 hover:text-brand-600 shadow-sm border border-orange-100 flex items-center gap-2">
+                    <i class="fas fa-monument"></i> Jawa
+                </button>
+                <button onclick="selectCategory('Kalimantan')" id="tab-Kalimantan" class="category-tab px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition duration-200 bg-white text-gray-600 hover:bg-orange-100 hover:text-brand-600 shadow-sm border border-orange-100 flex items-center gap-2">
+                    <i class="fas fa-tree"></i> Kalimantan
+                </button>
+                <button onclick="selectCategory('Sulawesi')" id="tab-Sulawesi" class="category-tab px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition duration-200 bg-white text-gray-600 hover:bg-orange-100 hover:text-brand-600 shadow-sm border border-orange-100 flex items-center gap-2">
+                    <i class="fas fa-water"></i> Sulawesi
+                </button>
+                <button onclick="selectCategory('NTB')" id="tab-NTB" class="category-tab px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition duration-200 bg-white text-gray-600 hover:bg-orange-100 hover:text-brand-600 shadow-sm border border-orange-100 flex items-center gap-2">
+                    <i class="fas fa-umbrella-beach"></i> NTB
+                </button>
+                <button onclick="selectCategory('NTT')" id="tab-NTT" class="category-tab px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition duration-200 bg-white text-gray-600 hover:bg-orange-100 hover:text-brand-600 shadow-sm border border-orange-100 flex items-center gap-2">
+                    <i class="fas fa-sun"></i> NTT
+                </button>
+                <button onclick="selectCategory('Papua')" id="tab-Papua" class="category-tab px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition duration-200 bg-white text-gray-600 hover:bg-orange-100 hover:text-brand-600 shadow-sm border border-orange-100 flex items-center gap-2">
+                    <i class="fas fa-feather-alt"></i> Papua
+                </button>
+            </div>
+        </section>
+
+        <!-- RECIPE CARDS GRID -->
+        <section id="recipeGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <!-- Dynamic Recipe Cards injected here -->
+        </section>
+
+        <!-- EMPTY STATE -->
+        <div id="emptyState" class="hidden text-center py-16 px-4">
+            <div class="w-20 h-20 bg-orange-100 text-brand-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+                <i class="fas fa-utensils"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 mb-1" id="emptyTitle">Resep Tidak Ditemukan</h3>
+            <p class="text-gray-500 text-sm max-w-sm mx-auto" id="emptyDesc">Coba cari dengan kata kunci lain atau pilih kategori daerah yang berbeda.</p>
+        </div>
+        <section id="communitySection" class="mt-12 bg-white rounded-3xl border border-orange-100 shadow-md p-5 sm:p-7">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5"><div><h2 class="text-xl font-bold font-serif text-gray-900"><i class="fas fa-users text-brand-500 mr-2"></i>Komunitas Rasantara</h2><p class="text-xs text-gray-500 mt-1">Komentar publik yang dapat dibaca semua pengunjung.</p></div><button onclick="loadPublicComments()" class="text-xs font-bold text-brand-600 hover:underline"><i class="fas fa-rotate"></i> Muat ulang</button></div>
+            <form onsubmit="submitPublicComment(event)" class="space-y-3 mb-5"><textarea id="publicCommentInput" required minlength="2" maxlength="1000" rows="3" placeholder="Bagikan pendapat atau pengalaman memasakmu..." class="w-full px-4 py-3 rounded-2xl border border-orange-100 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"></textarea><div class="flex justify-end"><button type="submit" class="px-5 py-2.5 bg-brand-500 hover:bg-brand-600 text-white rounded-full text-xs font-bold"><i class="fas fa-paper-plane mr-1"></i> Kirim komentar</button></div></form>
+            <div id="publicCommentsList" class="space-y-3"><p class="text-xs text-gray-400">Memuat komentar...</p></div>
+        </section>
+    </main>
+
+    <div id="complaintModal" class="fixed inset-0 z-[60] hidden bg-black/60 backdrop-blur-sm items-center justify-center p-4"><div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-6 relative"><button onclick="closeComplaintModal()" class="absolute top-4 right-4 text-gray-400"><i class="fas fa-times"></i></button><h2 class="text-xl font-bold font-serif text-gray-900 mb-1"><i class="fas fa-headset text-brand-500 mr-2"></i>Komplain Pelanggan</h2><p class="text-xs text-gray-500 mb-4">Komplain disimpan di Cloudflare dan hanya dapat dikelola admin.</p><form onsubmit="submitComplaint(event)" class="space-y-3"><input id="complaintSubject" required maxlength="120" placeholder="Subjek komplain" class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm"><textarea id="complaintMessage" required minlength="10" maxlength="3000" rows="5" placeholder="Jelaskan kendala atau keluhanmu..." class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm"></textarea><button class="w-full py-3 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-sm font-bold">Kirim komplain</button></form></div></div>
+
+    <!-- RECIPE DETAIL MODAL POPUP -->
+    <div id="recipeModal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-black/60 backdrop-blur-sm transition-opacity duration-300 flex items-center justify-center p-3 sm:p-4 md:p-6">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col transform transition-all scale-95 opacity-0 duration-300" id="modalContainer">
+            
+            <div class="relative h-60 sm:h-72 w-full flex-shrink-0 bg-gray-200">
+                <img id="modalImg" src="" alt="Foto Makanan" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent"></div>
+                
+                <button onclick="closeModal()" class="absolute top-4 right-4 bg-white/80 hover:bg-white text-gray-800 w-10 h-10 rounded-full flex items-center justify-center transition shadow-lg backdrop-blur-md z-10">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+
+                <button onclick="reportCurrentRecipe()" class="absolute top-4 right-40 bg-white/80 hover:bg-white text-gray-800 w-10 h-10 rounded-full flex items-center justify-center transition shadow-lg backdrop-blur-md z-10" title="Laporkan Resep">
+                    <i class="fas fa-flag text-red-500 text-base"></i>
+                </button>
+
+                <button onclick="shareCurrentRecipe()" class="absolute top-4 right-28 bg-white/80 hover:bg-white text-gray-800 w-10 h-10 rounded-full flex items-center justify-center transition shadow-lg backdrop-blur-md z-10" title="Bagikan Resep">
+                    <i class="fas fa-share-alt text-lg text-brand-600"></i>
+                </button>
+
+                <button id="modalFavBtn" onclick="toggleFavoriteCurrent()" class="absolute top-4 right-16 bg-white/80 hover:bg-white text-gray-800 w-10 h-10 rounded-full flex items-center justify-center transition shadow-lg backdrop-blur-md z-10">
+                    <i class="fas fa-heart text-lg text-gray-400" id="modalFavIcon"></i>
+                </button>
+
+                <div class="absolute bottom-4 left-4 right-4 text-white">
+                    <div class="flex items-center gap-2 mb-2 flex-wrap">
+                        <span id="modalRegionBadge" class="bg-brand-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow">Daerah</span>
+                        <span id="modalHalalBadge" class="text-xs font-bold px-2.5 py-1 rounded-full shadow flex items-center gap-1">Halal</span>
+                        <span id="modalAvgRatingBadge" class="bg-amber-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow flex items-center gap-1">
+                            <i class="fas fa-star text-amber-200"></i> <span id="modalRatingVal">0.0</span> (<span id="modalReviewCount">0</span> ulasan)
+                        </span>
+                    </div>
+                    <h2 id="modalTitle" class="text-2xl sm:text-3xl font-serif font-bold leading-tight drop-shadow">Nama Makanan</h2>
+                    <p id="modalSubRegion" class="text-orange-200 text-xs sm:text-sm font-medium flex items-center gap-1.5 mt-1">
+                        <i class="fas fa-map-marker-alt"></i> Asal: Sumatera Barat
+                    </p>
+                </div>
+            </div>
+
+            <div class="p-5 sm:p-7 overflow-y-auto space-y-6 flex-grow">
+                
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-orange-50/80 p-4 rounded-2xl border border-orange-100">
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs font-bold text-gray-700 uppercase tracking-wider"><i class="fas fa-users text-brand-500"></i> Porsi:</span>
+                        <div class="flex items-center bg-white rounded-full border border-orange-200 shadow-sm overflow-hidden">
+                            <button onclick="adjustPortion(-1)" class="w-8 h-8 flex items-center justify-center text-brand-600 hover:bg-orange-100 font-bold transition">-</button>
+                            <span id="portionCount" class="px-4 font-bold text-sm text-gray-800">4</span>
+                            <button onclick="adjustPortion(1)" class="w-8 h-8 flex items-center justify-center text-brand-600 hover:bg-orange-100 font-bold transition">+</button>
+                        </div>
+                    </div>
+                    <button onclick="startCookingMode()" class="w-full sm:w-auto bg-brand-500 hover:bg-brand-600 text-white px-5 py-2.5 rounded-full font-bold text-xs shadow-md transition flex items-center justify-center gap-2">
+                        <i class="fas fa-fire-burner text-base"></i> Mulai Mode Memasak
+                    </button>
+                </div>
+
+                <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                    <h3 class="text-base font-bold text-brand-700 mb-2 flex items-center gap-2">
+                        <i class="fas fa-book-open"></i> Asal-Usul & Latar Belakang
+                    </h3>
+                    <p id="modalOrigin" class="text-gray-700 text-sm leading-relaxed">Deskripsi asal-usul makanan...</p>
+                </div>
+
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2 border-b border-gray-100 pb-2">
+                        <i class="fas fa-shopping-basket text-brand-500"></i> Bahan-Bahan <span class="text-xs font-normal text-gray-500">(Takaran menyesuaikan porsi)</span>
+                    </h3>
+                    <ul id="modalIngredients" class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-700"></ul>
+                </div>
+
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2 border-b border-gray-100 pb-2">
+                        <i class="fas fa-list-ol text-brand-500"></i> Langkah-Langkah Memasak
+                    </h3>
+                    <ol id="modalSteps" class="space-y-3 text-sm text-gray-700"></ol>
+                </div>
+
+                <div class="bg-amber-50 p-4 rounded-2xl border border-amber-200/60 flex gap-3.5 items-start">
+                    <div class="w-9 h-9 bg-amber-500 text-white rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
+                        <i class="fas fa-lightbulb text-lg"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-amber-900 text-sm mb-1">Tips Rahasia Chef Rasantara</h4>
+                        <p id="modalTips" class="text-amber-800 text-xs sm:text-sm leading-relaxed">Tips spesial...</p>
+                    </div>
+                </div>
+
+                <!-- SECTION: MENU DISKUSI -->
+                <div class="border-t border-gray-100 pt-6">
+                    <h3 class="text-lg font-bold text-gray-900 mb-2 flex items-center gap-2">
+                        <i class="fas fa-comments text-brand-500"></i> Tanya Jawab & Diskusi Masak
+                    </h3>
+                    <p class="text-xs text-gray-500 mb-4">Ada yang salah atau gagal dengan masakanmu? Tanyakan kendalamu di sini agar dibantu sesama koki.</p>
+
+                    <form onsubmit="handleDiscussionSubmit(event)" class="bg-orange-50/50 p-4 rounded-2xl border border-orange-100 mb-4 space-y-3">
+                        <h4 class="font-bold text-xs uppercase tracking-wider text-gray-700">Ajukan Pertanyaan Masak</h4>
+                        <div>
+                            <textarea id="discussionInput" required rows="2" placeholder="Contoh: Kok kuah rawon saya jadi terlalu asin ya?" 
+                                class="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"></textarea>
+                        </div>
+                        <div class="flex justify-end">
+                            <button type="submit" class="px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1.5">
+                                <i class="fas fa-paper-plane"></i> Kirim Pertanyaan
+                            </button>
+                        </div>
+                    </form>
+
+                    <div id="discussionList" class="space-y-3"></div>
+                </div>
+
+                <!-- SECTION: ULASAN & RATING -->
+                <div class="border-t border-gray-100 pt-6">
+                    <h3 class="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
+                        <i class="fas fa-star text-amber-500"></i> Penilaian & Ulasan Resep
+                    </h3>
+
+                    <form onsubmit="handleReviewSubmit(event)" class="bg-gray-50 p-4 rounded-2xl border border-gray-200 mb-4 space-y-3">
+                        <h4 class="font-bold text-xs uppercase tracking-wider text-gray-700">Tulis Ulasan Anda (+10 Poin)</h4>
+                        <div class="flex items-center gap-3">
+                            <span class="text-sm text-gray-600 font-medium">Bintang:</span>
+                            <div class="flex gap-1 text-xl text-amber-400 cursor-pointer" id="starSelector">
+                                <i class="fas fa-star" onclick="setRatingInput(1)" data-val="1"></i>
+                                <i class="fas fa-star" onclick="setRatingInput(2)" data-val="2"></i>
+                                <i class="fas fa-star" onclick="setRatingInput(3)" data-val="3"></i>
+                                <i class="fas fa-star" onclick="setRatingInput(4)" data-val="4"></i>
+                                <i class="fas fa-star" onclick="setRatingInput(5)" data-val="5"></i>
+                            </div>
+                            <input type="hidden" id="reviewRatingVal" value="5">
+                        </div>
+                        <div>
+                            <textarea id="reviewComment" required rows="2" placeholder="Bagikan kesan atau pengalaman Anda memasak resep ini..." 
+                                class="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"></textarea>
+                        </div>
+                        <div class="flex justify-end">
+                            <button type="submit" class="px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1.5">
+                                <i class="fas fa-paper-plane"></i> Kirim Ulasan
+                            </button>
+                        </div>
+                    </form>
+                    <div id="reviewsList" class="space-y-3"></div>
+                </div>
+
+            </div>
+
+            <div class="p-4 bg-gray-50 border-t border-gray-100 flex justify-end">
+                <button onclick="closeModal()" class="px-6 py-2.5 bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold rounded-full transition shadow-md">
+                    Tutup Resep
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AUTH MODAL -->
+    <div id="authModal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 relative">
+            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 w-8 h-8 rounded-full flex items-center justify-center">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="text-center mb-6">
+                <div class="w-14 h-14 bg-orange-100 text-brand-500 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl shadow-inner">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <h3 class="text-xl font-bold font-serif text-gray-800" id="authTitle">Masuk ke Rasantara</h3>
+                <p class="text-xs text-gray-500 mt-1">Kumpulkan poin kontributor dan bangun reputasi memasak Anda</p>
+            </div>
+
+            <form onsubmit="handleAuthSubmit(event)" class="space-y-4">
+                <div id="nameFieldContainer" class="hidden">
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Nama Lengkap</label>
+                    <input type="text" id="authName" placeholder="Contoh: Siti Aisyah" 
+                        class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Email</label>
+                    <input type="text" id="authEmail" required placeholder="nama@email.com" 
+                        class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Kata Sandi</label>
+                    <input type="password" id="authPassword" required minlength="10" placeholder="Minimal 10 karakter" 
+                        class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+
+                <button type="submit" id="authSubmitBtn" class="w-full py-3 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-bold text-sm shadow-md transition">
+                    Masuk Sekarang
+                </button>
+            </form>
+
+            <div class="mt-4 text-center text-xs text-gray-500">
+                <span id="authToggleText">Belum punya akun?</span>
+                <button type="button" onclick="toggleAuthMode()" class="text-brand-600 font-bold hover:underline ml-1" id="authToggleBtn">Buat Akun Baru</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- USER PROFILE MODAL -->
+    <div id="profileModal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full max-h-[85vh] overflow-hidden flex flex-col p-6 relative">
+            <button onclick="closeProfileModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 w-8 h-8 rounded-full flex items-center justify-center">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <div class="flex items-center gap-4 border-b border-gray-100 pb-4 mb-4">
+                <div class="w-14 h-14 bg-brand-500 text-white font-bold rounded-2xl flex items-center justify-center text-2xl shadow-md" id="profileModalInitial">U</div>
+                <div>
+                    <h3 class="text-lg font-bold font-serif text-gray-800" id="profileModalName">Nama Pengguna</h3>
+                    <p class="text-xs text-gray-500" id="profileModalEmail">email@domain.com</p>
+                    <span class="inline-block mt-1 bg-amber-100 text-amber-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full" id="profileBadge">Chef Pemula</span>
+                </div>
+            </div>
+
+            <div class="bg-orange-50 p-4 rounded-2xl border border-orange-100 mb-4 flex items-center justify-between">
+                <div>
+                    <span class="text-xs text-gray-500 block">Total Poin Kontributor</span>
+                    <span class="text-2xl font-bold text-brand-600" id="profilePointsNum">0</span> Poin
+                </div>
+                <div class="text-right text-xs text-orange-800">
+                    <p><i class="fas fa-info-circle"></i> Tambah resep: +50 Poin</p>
+                    <p><i class="fas fa-info-circle"></i> Tulis ulasan: +10 Poin</p>
+                </div>
+            </div>
+
+            <div class="overflow-y-auto space-y-4 flex-grow pr-1">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-gray-500"><i class="fas fa-history text-brand-500"></i> Riwayat Ulasan Anda</h4>
+                <div id="userReviewsHistoryList" class="space-y-3"></div>
+            </div>
+
+            <div class="pt-4 border-t border-gray-100 mt-4 flex justify-end">
+                <button onclick="closeProfileModal()" class="px-5 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold transition">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- COOKING MODE FULLSCREEN MODAL -->
+    <div id="cookingModeModal" class="fixed inset-0 z-50 hidden bg-gray-900/95 text-white flex flex-col justify-between p-4 sm:p-8 backdrop-blur-md">
+        <div class="flex items-center justify-between border-b border-gray-800 pb-4">
+            <div>
+                <span class="text-xs uppercase tracking-wider text-orange-400 font-bold">Mode Memasak Interaktif</span>
+                <h2 id="cookModeTitle" class="text-xl sm:text-2xl font-serif font-bold">Nama Makanan</h2>
+            </div>
+            <button onclick="closeCookingMode()" class="bg-gray-800 hover:bg-gray-700 w-10 h-10 rounded-full flex items-center justify-center text-white transition text-lg">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="max-w-2xl mx-auto w-full text-center space-y-6 my-auto py-8">
+            <div class="inline-block bg-brand-500/20 border border-brand-500/40 text-brand-300 font-bold px-4 py-1.5 rounded-full text-sm">
+                Langkah ke-<span id="currentStepNum">1</span> dari <span id="totalStepNum">5</span>
+            </div>
+            
+            <p id="cookModeStepText" class="text-xl sm:text-3xl font-medium leading-relaxed text-orange-50 min-h-[120px] flex items-center justify-center">
+                Instruksi langkah memasak...
+            </p>
+
+            <div class="bg-gray-800/80 border border-gray-700 p-4 rounded-2xl max-w-xs mx-auto shadow-xl">
+                <div class="flex items-center justify-center gap-2 text-amber-400 mb-2 text-sm font-bold">
+                    <i class="fas fa-stopwatch text-base"></i> Timer Rekomendasi (5 Menit)
+                </div>
+                <div id="timerDisplay" class="text-3xl font-mono font-bold text-white mb-3">05:00</div>
+                <div class="flex justify-center gap-2">
+                    <button onclick="startTimer()" class="bg-brand-500 hover:bg-brand-600 text-white px-4 py-1.5 rounded-xl text-xs font-bold transition">Mulai</button>
+                    <button onclick="pauseTimer()" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-1.5 rounded-xl text-xs font-bold transition">Jeda</button>
+                    <button onclick="resetTimer()" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-1.5 rounded-xl text-xs font-bold transition">Reset</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="max-w-2xl mx-auto w-full flex items-center justify-between border-t border-gray-800 pt-4">
+            <button onclick="prevCookingStep()" id="prevStepBtn" class="bg-gray-800 hover:bg-gray-700 text-white px-6 py-3 rounded-2xl font-bold text-sm transition flex items-center gap-2 disabled:opacity-30 disabled:cursor-not-allowed">
+                <i class="fas fa-arrow-left"></i> Sebelumnya
+            </button>
+            <button onclick="nextCookingStep()" id="nextStepBtn" class="bg-brand-500 hover:bg-brand-600 text-white px-6 py-3 rounded-2xl font-bold text-sm transition flex items-center gap-2">
+                Selanjutnya <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- ADD RECIPE MODAL FORM -->
+    <div id="addRecipeModal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-black/60 backdrop-blur-sm transition-opacity duration-300 flex items-center justify-center p-3 sm:p-4 md:p-6">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col transform transition-all scale-95 opacity-0 duration-300" id="addModalContainer">
+            
+            <div class="bg-gradient-to-r from-brand-500 to-amber-500 p-5 sm:p-6 text-white flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-xl">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold font-serif">Bagikan Resep Nusantara (+50 Poin)</h2>
+                        <p class="text-xs text-orange-100">Pastikan mengisi bahan dan langkah secara lengkap dan valid</p>
+                    </div>
+                </div>
+                <button onclick="closeAddRecipeModal()" class="bg-white/20 hover:bg-white/40 text-white w-9 h-9 rounded-full flex items-center justify-center transition">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form id="addRecipeForm" onsubmit="handleAddRecipe(event)" class="p-5 sm:p-6 overflow-y-auto space-y-4 flex-grow text-gray-700">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">Nama Makanan *</label>
+                        <input type="text" id="newRecipeName" required placeholder="Contoh: Ayam Betutu Bali" 
+                            class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">Kategori Daerah *</label>
+                        <select id="newRecipeRegion" required class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm bg-white">
+                            <option value="Sumatera">Sumatera</option>
+                            <option value="Jawa">Jawa</option>
+                            <option value="Kalimantan">Kalimantan</option>
+                            <option value="Sulawesi">Sulawesi</option>
+                            <option value="NTB">NTB</option>
+                            <option value="NTT">NTT</option>
+                            <option value="Papua">Papua</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">Spesifik Asal Daerah *</label>
+                        <input type="text" id="newRecipeSubRegion" required placeholder="Contoh: Bali / Gianyar" 
+                            class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">Status Kehalalan *</label>
+                        <select id="newRecipeHalalStatus" required class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm bg-white">
+                            <option value="Halal">Halal</option>
+                            <option value="Haram">Haram (Non-Halal)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">URL Gambar (Opsional)</label>
+                    <input type="url" id="newRecipeImage" placeholder="https://..." 
+                        class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">Asal-Usul / Sejarah Singkat *</label>
+                    <textarea id="newRecipeOrigin" required rows="2" placeholder="Ceritakan sedikit latar belakang atau tradisi masakan ini..." 
+                        class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Bahan-Bahan * <span class="text-gray-400 font-normal lowercase">(minimal 3 baris takaran bahan)</span></label>
+                    <textarea id="newRecipeIngredients" required rows="3" placeholder="1 ekor ayam utuh&#10;5 siung bawang merah&#10;1 sdt garam" 
+                        class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Langkah Memasak * <span class="text-gray-400 font-normal lowercase">(minimal 3 baris instruksi langkah)</span></label>
+                    <textarea id="newRecipeSteps" required rows="3" placeholder="Lumuri ayam dengan bumbu rempah.&#10;Bungkus dengan daun pisang.&#10;Kukus atau panggang hingga matang." 
+                        class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">Tips Rahasia Memasak *</label>
+                    <input type="text" id="newRecipeTips" required placeholder="Contoh: Gunakan api sedang agar bumbu meresap sempurna." 
+                        class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm">
+                </div>
+
+                <div class="pt-3 border-t border-gray-100 flex items-center justify-end gap-3">
+                    <button type="button" onclick="closeAddRecipeModal()" class="px-5 py-2.5 text-gray-600 hover:bg-gray-100 rounded-full text-sm font-semibold transition">
+                        Batal
+                    </button>
+                    <button type="submit" class="px-6 py-2.5 bg-brand-500 hover:bg-brand-600 text-white rounded-full text-sm font-semibold transition shadow-md flex items-center gap-2">
+                        <i class="fas fa-paper-plane"></i> Kirim untuk Ditinjau
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-orange-100 py-6 mt-12">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <div class="flex items-center justify-center gap-2 mb-2">
+                <span class="font-serif font-bold text-xl text-brand-500">Rasantara</span>
+                <span class="text-xs bg-orange-100 text-brand-600 font-bold px-2 py-0.5 rounded-full">Resep Nusantara</span>
+            </div>
+            <p class="text-xs text-gray-500">© 2026 Rasantara - Warisan Kuliner Kaya Rasa Indonesia. Dibuat dengan penuh rasa cinta pada masakan daerah.</p>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        const defaultRecipes = [
+            {
+                id: 'rendang',
+                name: 'Rendang Daging',
+                region: 'Sumatera',
+                subRegion: 'Sumatera Barat (Minangkabau)',
+                image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=800&q=80',
+                cookingTime: '4 Jam',
+                difficulty: 'Sedang - Tinggi',
+                halalStatus: 'Halal',
+                origin: 'Rendang lahir dari tradisi merantau masyarakat Minangkabau. Proses memasak santan dan rempah dalam waktu lama menghasilkan olahan daging yang tahan lama.',
+                ingredients: [
+                    '1 kg daging sapi',
+                    '1000 ml santan kental',
+                    '2 lembar daun kunyit',
+                    '4 lembar daun jeruk purut',
+                    '2 batang serai',
+                    '12 siung bawang merah'
+                ],
+                steps: [
+                    'Haluskan bawang merah, bawang putih, cabai, jahe, kunyit, dan lengkuas.',
+                    'Didihkan santan kental bersama bumbu halus sambil terus diaduk.',
+                    'Setelah santan mengeluarkan minyak, masukkan potongan daging sapi.',
+                    'Kecilkan api, masak terus hingga cairan menyusut menjadi cokelat kehitaman.'
+                ],
+                tips: 'Gunakan santan murni dari kelapa tua. Jangan berhenti mengaduk saat proses pengentalan awal.',
+                reviews: [
+                    { userEmail: 'siti@gmail.com', userName: 'Siti Rahma', rating: 5, comment: 'Resep rendang paling autentik!' }
+                ],
+                discussions: [
+                    { userEmail: 'budi@gmail.com', userName: 'Budi Santoso', question: 'Kenapa rendang saya dagingnya jadi alot padahal sudah dimasak 2 jam?', replies: [{ userName: 'Siti Rahma', text: 'Mungkin potongan dagingnya melawan serat atau apinya terlalu besar sehingga air keburu habis sebelum daging empuk.' }] }
+                ],
+                reports: 0
+            },
+            {
+                id: 'rawon',
+                name: 'Rawon Daging Sapi',
+                region: 'Jawa',
+                subRegion: 'Jawa Timur (Surabaya)',
+                image: 'https://images.unsplash.com/photo-1541832676-9b763b0239ab?auto=format&fit=crop&w=800&q=80',
+                cookingTime: '2 Jam',
+                difficulty: 'Sedang',
+                halalStatus: 'Halal',
+                origin: 'Rawon adalah salah satu masakan tertua di Jawa yang dicatat dalam prasasti kuno Taji (901 M).',
+                ingredients: [
+                    '500g daging sapi',
+                    '6 buah kluwek',
+                    '8 siung bawang merah',
+                    '4 siung bawang putih',
+                    '3 butir kemiri'
+                ],
+                steps: [
+                    'Rebus daging sapi hingga empuk, lalu potong dadu.',
+                    'Haluskan bumbu halus bersama isi kluwek yang sudah direndam.',
+                    'Tumis bumbu halus, serai, lengkuas, dan daun jeruk hingga harum.',
+                    'Masukkan tumisan bumbu ke dalam air kaldu daging dan masak hingga meresap.'
+                ],
+                tips: 'Pilih kluwek yang rasanya tidak pahit dengan cara mencicipi sedikit daging buahnya.',
+                reviews: [
+                    { userEmail: 'budi@gmail.com', userName: 'Budi Santoso', rating: 5, comment: 'Kuah hitamnya sedap banget!' }
+                ],
+                discussions: [],
+                reports: 0
+            },
+            {
+                id: 'soto-banjar',
+                name: 'Soto Banjar',
+                region: 'Kalimantan',
+                subRegion: 'Kalimantan Selatan (Banjarmasin)',
+                image: 'https://images.unsplash.com/photo-1572656631137-7935297eff55?auto=format&fit=crop&w=800&q=80',
+                cookingTime: '1.5 Jam',
+                difficulty: 'Mudah - Sedang',
+                halalStatus: 'Halal',
+                origin: 'Soto Banjar merupakan warisan kuliner suku Banjar dengan aroma harum rempah manis.',
+                ingredients: [
+                    '1 ekor ayam kampung',
+                    '2 batang kayu manis',
+                    '4 butir kapulaga',
+                    '8 siung bawang merah'
+                ],
+                steps: [
+                    'Rebus ayam kampung bersama kayu manis, kapulaga, dan cengkeh.',
+                    'Angkat ayam dan suwir-suwir dagingnya.',
+                    'Tumis bumbu halus lalu masukkan ke dalam kuah kaldu.',
+                    'Sajikan bersama ketupat dan perkedel kentang.'
+                ],
+                tips: 'Tambahkan sedikit susu evaporasi ke dalam kuah kaldu untuk hasil yang lebih gurih creamy.',
+                reviews: [],
+                discussions: [],
+                reports: 0
+            },
+            {
+                id: 'coto-makassar',
+                name: 'Coto Makassar',
+                region: 'Sulawesi',
+                subRegion: 'Sulawesi Selatan (Makassar)',
+                image: 'https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=800&q=80',
+                cookingTime: '2.5 Jam',
+                difficulty: 'Sedang',
+                halalStatus: 'Halal',
+                origin: 'Coto Makassar telah ada sejak zaman Kerajaan Gowa pada abad ke-16.',
+                ingredients: [
+                    '500g daging sapi',
+                    '300g jeroan sapi',
+                    '100g kacang tanah',
+                    '2000 ml air tajin'
+                ],
+                steps: [
+                    'Rebus daging dan jeroan menggunakan air cucian beras (tajin).',
+                    'Haluskan bumbu dan kacang tanah, lalu tumis hingga harum.',
+                    'Masukkan tumisan ke air rebusan kaldu dan masak hingga gurih.'
+                ],
+                tips: 'Air cucian beras (tajin) adalah kunci utama kelezatan tekstur kuahnya.',
+                reviews: [],
+                discussions: [],
+                reports: 0
+            },
+            {
+                id: 'ayam-taliwang',
+                name: 'Ayam Taliwang',
+                region: 'NTB',
+                subRegion: 'Nusa Tenggara Barat (Lombok)',
+                image: 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=800&q=80',
+                cookingTime: '1 Jam',
+                difficulty: 'Sedang',
+                halalStatus: 'Halal',
+                origin: 'Ayam Taliwang berasal dari Karang Taliwang di Mataram, Lombok.',
+                ingredients: [
+                    '1 ekor ayam kampung',
+                    '10 buah cabai merah',
+                    '8 siung bawang merah',
+                    '2 sdt terasi bakar'
+                ],
+                steps: [
+                    'Bakar ayam kampung muda setengah matang.',
+                    'Haluskan bumbu cabai, bawang, dan terasi lalu tumis.',
+                    'Lumuri ayam dengan bumbu dan panggang kembali.'
+                ],
+                tips: 'Gunakan ayam kampung yang masih sangat muda agar dagingnya empuk.',
+                reviews: [],
+                discussions: [],
+                reports: 0
+            },
+            {
+                id: 'sei-sapi',
+                name: 'Se\'i Sapi Sambal Lu\'at',
+                region: 'NTT',
+                subRegion: 'Nusa Tenggara Timur (Rote / Kupang)',
+                image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80',
+                cookingTime: '3 Jam',
+                difficulty: 'Tinggi',
+                halalStatus: 'Halal',
+                origin: 'Se\'i adalah teknik pengasapan daging tradisional khas suku Rote.',
+                ingredients: [
+                    '1 kg daging sapi',
+                    '1 sdm garam',
+                    'Daun kosambi',
+                    'Cabai rawit & kemangi'
+                ],
+                steps: [
+                    'Lumuri daging sapi dengan garam dan lada.',
+                    'Asap daging di atas bara kayu beraroma daun kosambi.',
+                    'Iris tipis dan sajikan bersama sambal lu\'at.'
+                ],
+                tips: 'Kunci aroma khas Se\'i terletak pada asap daun kayu kosambi.',
+                reviews: [],
+                discussions: [],
+                reports: 0
+            },
+            {
+                id: 'papeda-ikan-kuah-kunung',
+                name: 'Papeda Ikan Kuah Kuning',
+                region: 'Papua',
+                subRegion: 'Papua & Maluku',
+                image: 'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=800&q=80',
+                cookingTime: '45 Menit',
+                difficulty: 'Mudah',
+                halalStatus: 'Halal',
+                origin: 'Papeda adalah makanan pokok masyarakat Papua dan Maluku dari tepung sagu.',
+                ingredients: [
+                    '200g tepung sagu',
+                    '1000 ml air panas',
+                    '500g ikan tongkol',
+                    'Bumbu kunyit & jahe'
+                ],
+                steps: [
+                    'Siram tepung sagu dengan air mendidih sambil diaduk cepat hingga bening.',
+                    'Masak ikan dengan kuah kuning rempah.',
+                    'Sajikan papeda bersama kuah ikan segar.'
+                ],
+                tips: 'Pastikan air penyiram sagu benar-benar mendidih 100°C.',
+                reviews: [],
+                discussions: [],
+                reports: 0
+            }
+        ];
+
+        let recipes = JSON.parse(localStorage.getItem('rasantara_recipes')) || defaultRecipes;
+        let currentUser = JSON.parse(localStorage.getItem('rasantara_current_user')) || null;
+        let isRegisterMode = false;
+        let currentCategory = 'all';
+        let currentActiveRecipeId = null;
+        let currentPortion = 4;
+        let basePortion = 4;
+
+        let currentCookingSteps = [];
+        let currentStepIndex = 0;
+        let timerInterval = null;
+        let timerSeconds = 300;
+
+        function getSmartFoodImage(name, region) {
+            const query = (name + ' ' + region).toLowerCase();
+            if (query.includes('sate')) return 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=800&q=80';
+            if (query.includes('bakso') || query.includes('mie') || query.includes('soto')) return 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=800&q=80';
+            if (query.includes('ikan') || query.includes('seafood') || query.includes('kuah')) return 'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=800&q=80';
+            if (query.includes('ayam') || query.includes('bebek')) return 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=800&q=80';
+            if (query.includes('daging') || query.includes('rendang') || query.includes('sapi')) return 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=800&q=80';
+            
+            if (region === 'Sumatera') return 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80';
+            if (region === 'Jawa') return 'https://images.unsplash.com/photo-1541832676-9b763b0239ab?auto=format&fit=crop&w=800&q=80';
+            if (region === 'Kalimantan') return 'https://images.unsplash.com/photo-1572656631137-7935297eff55?auto=format&fit=crop&w=800&q=80';
+            if (region === 'Sulawesi') return 'https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=800&q=80';
+            
+            return 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateUserUI();
+            renderRecipes(recipes);
+        });
+
+        function getUserBadge(points) {
+            if (points >= 200) return 'Master Kuliner Nusantara ⭐';
+            if (points >= 100) return 'Chef Senior 👨‍🍳';
+            if (points >= 50) return 'Koki Rumah 🍳';
+            return 'Chef Pemula 🥄';
+        }
+
+        function updateUserUI() {
+            const loginBtn = document.getElementById('loginBtnNav');
+            const profileNav = document.getElementById('userProfileNav');
+
+            if (currentUser) {
+                loginBtn.classList.add('hidden');
+                profileNav.classList.remove('hidden');
+                profileNav.classList.add('flex');
+                document.getElementById('userNameDisplay').innerText = currentUser.name;
+                document.getElementById('userInitial').innerText = currentUser.name.charAt(0).toUpperCase();
+                
+                const points = currentUser.points || 0;
+                document.getElementById('userPointsDisplay').innerText = points;
+                
+                const userFavs = currentUser.favorites || [];
+                document.getElementById('favCount').innerText = userFavs.length;
+            } else {
+                profileNav.classList.remove('flex');
+                profileNav.classList.add('hidden');
+                loginBtn.classList.remove('hidden');
+                document.getElementById('favCount').innerText = '0';
+            }
+        }
+
+        function openAuthModal() {
+            document.getElementById('authModal').classList.remove('hidden');
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authModal').classList.add('hidden');
+            isRegisterMode = false;
+            updateAuthModalUI();
+        }
+
+        function toggleAuthMode() {
+            isRegisterMode = !isRegisterMode;
+            updateAuthModalUI();
+        }
+
+        function updateAuthModalUI() {
+            const title = document.getElementById('authTitle');
+            const nameField = document.getElementById('nameFieldContainer');
+            const submitBtn = document.getElementById('authSubmitBtn');
+            const toggleText = document.getElementById('authToggleText');
+            const toggleBtn = document.getElementById('authToggleBtn');
+
+            if (isRegisterMode) {
+                title.innerText = 'Daftar Akun Rasantara';
+                nameField.classList.remove('hidden');
+                submitBtn.innerText = 'Daftar Sekarang';
+                toggleText.innerText = 'Sudah punya akun?';
+                toggleBtn.innerText = 'Masuk';
+            } else {
+                title.innerText = 'Masuk ke Rasantara';
+                nameField.classList.add('hidden');
+                submitBtn.innerText = 'Masuk Sekarang';
+                toggleText.innerText = 'Belum punya akun?';
+                toggleBtn.innerText = 'Buat Akun Baru';
+            }
+        }
+
+        async function handleAuthSubmit(e) {
+            e.preventDefault();
+            const email = document.getElementById('authEmail').value.trim().toLowerCase();
+            const password = document.getElementById('authPassword').value;
+            const name = document.getElementById('authName').value.trim();
+            try {
+                const response = await fetch('/api/auth/' + (isRegisterMode ? 'register' : 'login'), {
+                    method: 'POST', headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({email, password, name})
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Autentikasi gagal.');
+                localStorage.setItem('rasantara_token', data.token);
+                currentUser = data.user;
+                localStorage.setItem('rasantara_current_user', JSON.stringify(currentUser));
+                closeAuthModal(); updateUserUI(); filterRecipes();
+                alert(isRegisterMode ? 'Akun berhasil dibuat.' : 'Berhasil masuk.');
+            } catch (error) { alert(error.message + (location.hostname === 'localhost' ? '' : '\nPastikan Worker Cloudflare sudah dipasang.')); }
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            localStorage.removeItem('rasantara_current_user');
+            localStorage.removeItem('rasantara_token');
+            updateUserUI();
+            if (currentCategory === 'favorites') selectCategory('all');
+            else filterRecipes();
+        }
+
+        function openProfileModal() {
+            if (!currentUser) return;
+
+            document.getElementById('profileModalName').innerText = currentUser.name;
+            document.getElementById('profileModalEmail').innerText = currentUser.email;
+            document.getElementById('profileModalInitial').innerText = currentUser.name.charAt(0).toUpperCase();
+            
+            const points = currentUser.points || 0;
+            document.getElementById('profilePointsNum').innerText = points;
+            document.getElementById('profileBadge').innerText = getUserBadge(points);
+
+            const reviewListContainer = document.getElementById('userReviewsHistoryList');
+            reviewListContainer.innerHTML = '';
+
+            let userReviewsCount = 0;
+            recipes.forEach(recipe => {
+                if (recipe.reviews) {
+                    recipe.reviews.forEach(rev => {
+                        if (rev.userEmail === currentUser.email) {
+                            userReviewsCount++;
+                            let starsHtml = '';
+                            for (let i = 1; i <= 5; i++) {
+                                starsHtml += `<i class="fas fa-star ${i <= rev.rating ? 'text-amber-400' : 'text-gray-200'}"></i>`;
+                            }
+
+                            const div = document.createElement('div');
+                            div.className = "bg-orange-50/50 p-3 rounded-2xl border border-orange-100 space-y-1 text-xs";
+                            div.innerHTML = `
+                                <div class="flex items-center justify-between">
+                                    <span class="font-bold text-brand-700">${recipe.name}</span>
+                                    <div class="flex gap-0.5">${starsHtml}</div>
+                                </div>
+                                <p class="text-gray-600">"${rev.comment}"</p>
+                            `;
+                            reviewListContainer.appendChild(div);
+                        }
+                    });
+                }
+            });
+
+            if (userReviewsCount === 0) {
+                reviewListContainer.innerHTML = `<p class="text-xs text-gray-400 italic">Anda belum pernah menulis ulasan pada resep manapun.</p>`;
+            }
+
+            document.getElementById('profileModal').classList.add('flex');
+            document.getElementById('profileModal').classList.remove('hidden');
+        }
+
+        function closeProfileModal() {
+            document.getElementById('profileModal').classList.add('hidden');
+            document.getElementById('profileModal').classList.remove('flex');
+        }
+
+        function shareCurrentRecipe() {
+            const recipe = recipes.find(r => r.id === currentActiveRecipeId);
+            if (!recipe) return;
+
+            const shareData = {
+                title: `Resep ${recipe.name} - Rasantara`,
+                text: `Yuk coba masak ${recipe.name} (${recipe.subRegion}) khas Nusantara!`,
+                url: window.location.href
+            };
+
+            if (navigator.share) {
+                navigator.share(shareData).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(`${shareData.title}\n${shareData.text}\n${shareData.url}`);
+                alert('Tautan resep berhasil disalin ke papan klip!');
+            }
+        }
+
+        function reportCurrentRecipe() {
+            if (!currentUser) {
+                alert('Silakan masuk terlebih dahulu untuk melaporkan resep.');
+                openAuthModal();
+                return;
+            }
+
+            const recipe = recipes.find(r => r.id === currentActiveRecipeId);
+            if (!recipe) return;
+
+            if (confirm(`Laporkan resep "${recipe.name}" karena konten tidak valid atau palsu?`)) {
+                recipe.reports = (recipe.reports || 0) + 1;
+                if (recipe.reports >= 3) {
+                    recipes = recipes.filter(r => r.id !== recipe.id);
+                    alert('Resep telah dihapus otomatis karena mendapat banyak laporan dari komunitas.');
+                    closeModal();
+                } else {
+                    alert('Terima kasih. Laporan Anda telah dikirim untuk ditinjau.');
+                }
+
+                localStorage.setItem('rasantara_recipes', JSON.stringify(recipes));
+                filterRecipes();
+            }
+        }
+
+        function renderRecipes(items) {
+            const grid = document.getElementById('recipeGrid');
+            const emptyState = document.getElementById('emptyState');
+            const recipeCount = document.getElementById('recipeCount');
+
+            grid.innerHTML = '';
+            recipeCount.innerText = `${items.length} Resep Tersedia`;
+
+            if (items.length === 0) {                emptyState.classList.remove('hidden');
+                if (currentCategory === 'favorites') {
+                    document.getElementById('emptyTitle').innerText = 'Belum Ada Resep Favorit';
+                    document.getElementById('emptyDesc').innerText = currentUser ? 'Klik ikon hati (❤️) pada resep untuk menyimpannya.' : 'Silakan masuk terlebih dahulu untuk menggunakan fitur favorit.';
+                } else {
+                    document.getElementById('emptyTitle').innerText = 'Resep Tidak Ditemukan';
+                    document.getElementById('emptyDesc').innerText = 'Coba cari dengan kata kunci lain atau pilih kategori daerah yang berbeda.';
+                }
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            items.forEach(recipe => {
+                const userFavs = currentUser ? (currentUser.favorites || []) : [];
+                const isFav = userFavs.includes(recipe.id);
+                const avgRating = calculateAverageRating(recipe);
+                const isHalal = (!recipe.halalStatus || recipe.halalStatus === 'Halal');
+
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 flex flex-col cursor-pointer border border-orange-100/80 group relative";
+                card.onclick = (e) => {
+                    if (e.target.closest('.fav-btn')) return;
+                    openModal(recipe.id);
+                };
+
+                card.innerHTML = `
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="${recipe.image}" alt="${recipe.name}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        <span class="absolute top-3 left-3 bg-brand-500/95 backdrop-blur-md text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow">
+                            ${recipe.region}
+                        </span>
+                        <!-- Halal / Haram Badge on Card -->
+                        <span class="absolute top-3 left-28 ${isHalal ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'} text-[10px] font-extrabold px-2.5 py-1 rounded-full shadow tracking-wide">
+                            ${isHalal ? 'HALAL' : 'HARAM'}
+                        </span>
+
+                        <button onclick="toggleFavorite('${recipe.id}')" class="fav-btn absolute top-3 right-3 w-9 h-9 rounded-full bg-white/80 hover:bg-white backdrop-blur-md flex items-center justify-center shadow transition text-lg">
+                            <i class="fas fa-heart ${isFav ? 'text-red-500' : 'text-gray-400'}"></i>
+                        </button>
+                        <div class="absolute bottom-2 right-2 bg-black/60 backdrop-blur-md text-white text-xs px-2.5 py-1 rounded-md flex items-center gap-1">
+                            <i class="far fa-clock text-amber-300"></i> ${recipe.cookingTime}
+                        </div>
+                    </div>
+                    <div class="p-5 flex-grow flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs font-medium text-orange-600 truncate max-w-[150px]">
+                                    <i class="fas fa-map-marker-alt"></i> ${recipe.subRegion}
+                                </span>
+                                <span class="text-xs font-bold text-amber-600 flex items-center gap-1 bg-amber-50 px-2 py-0.5 rounded-md">
+                                    <i class="fas fa-star"></i> ${avgRating}
+                                </span>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-800 group-hover:text-brand-500 transition duration-200 font-serif leading-snug">
+                                ${recipe.name}
+                            </h3>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
+                            <span class="flex items-center gap-1 font-medium text-amber-700">
+                                <i class="fas fa-fire"></i> ${recipe.difficulty}
+                            </span>
+                            <span class="text-brand-500 font-bold group-hover:translate-x-1 transition duration-200 flex items-center gap-1">
+                                Lihat Resep <i class="fas fa-arrow-right text-xs"></i>
+                            </span>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function calculateAverageRating(recipe) {
+            if (!recipe.reviews || recipe.reviews.length === 0) return '5.0';
+            const sum = recipe.reviews.reduce((acc, r) => acc + r.rating, 0);
+            return (sum / recipe.reviews.length).toFixed(1);
+        }
+
+        function toggleFavorite(id) {
+            if (!currentUser) {
+                alert('Silakan masuk terlebih dahulu untuk menyimpan resep ke favorit Anda.');
+                openAuthModal();
+                return;
+            }
+
+            if (!currentUser.favorites) currentUser.favorites = [];
+            const index = currentUser.favorites.indexOf(id);
+            if (index > -1) {
+                currentUser.favorites.splice(index, 1);
+            } else {
+                currentUser.favorites.push(id);
+            }
+
+            updateSessionUser();
+            updateUserUI();
+            filterRecipes();
+
+            if (currentActiveRecipeId === id) updateModalFavoriteState();
+        }
+
+        function toggleFavoriteCurrent() {
+            if (currentActiveRecipeId) toggleFavorite(currentActiveRecipeId);
+        }
+
+        function updateModalFavoriteState() {
+            const userFavs = currentUser ? (currentUser.favorites || []) : [];
+            const isFav = userFavs.includes(currentActiveRecipeId);
+            const icon = document.getElementById('modalFavIcon');
+            if (isFav) {
+                icon.classList.remove('text-gray-400');
+                icon.classList.add('text-red-500');
+            } else {
+                icon.classList.remove('text-red-500');
+                icon.classList.add('text-gray-400');
+            }
+        }
+
+        function updateSessionUser() {
+            localStorage.setItem('rasantara_current_user', JSON.stringify(currentUser));
+            let allUsers = JSON.parse(localStorage.getItem('rasantara_users')) || [];
+            allUsers = allUsers.map(u => u.email === currentUser.email ? currentUser : u);
+            localStorage.setItem('rasantara_users', JSON.stringify(allUsers));
+        }
+
+        function selectCategory(category) {
+            currentCategory = category;
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.classList.remove('bg-brand-500', 'text-white', 'shadow-md');
+                tab.classList.add('bg-white', 'text-gray-600', 'hover:bg-orange-100', 'hover:text-brand-600', 'border', 'border-orange-100');
+            });
+            const activeTab = document.getElementById(`tab-${category}`);
+            if (activeTab) {
+                activeTab.classList.remove('bg-white', 'text-gray-600', 'hover:bg-orange-100', 'hover:text-brand-600', 'border', 'border-orange-100');
+                activeTab.classList.add('bg-brand-500', 'text-white', 'shadow-md');
+            }
+            filterRecipes();
+        }
+
+        function filterRecipes() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = recipes.filter(recipe => {
+                let matchesCategory = true;
+                if (currentCategory === 'favorites') {
+                    const userFavs = currentUser ? (currentUser.favorites || []) : [];
+                    matchesCategory = userFavs.includes(recipe.id);
+                } else if (currentCategory !== 'all') {
+                    matchesCategory = recipe.region.toLowerCase() === currentCategory.toLowerCase();
+                }
+
+                const matchesSearch = recipe.name.toLowerCase().includes(query) || 
+                                      recipe.region.toLowerCase().includes(query) ||
+                                      recipe.subRegion.toLowerCase().includes(query) ||
+                                      recipe.ingredients.some(ing => ing.toLowerCase().includes(query));
+
+                return matchesCategory && matchesSearch;
+            });
+            renderRecipes(filtered);
+        }
+
+        function adjustPortion(amount) {
+            currentPortion += amount;
+            if (currentPortion < 1) currentPortion = 1;
+            if (currentPortion > 20) currentPortion = 20;
+            document.getElementById('portionCount').innerText = currentPortion;
+            
+            const recipe = recipes.find(r => r.id === currentActiveRecipeId);
+            if (recipe) renderIngredientsList(recipe);
+        }
+
+        function scaleIngredientText(text, multiplier) {
+            return text.replace(/^([\d\/]+(\.\d+)?)\s*/, (match, p1) => {
+                let val = eval(p1);
+                if (isNaN(val)) return match;
+                let scaled = Math.round(val * multiplier * 10) / 10;
+                return scaled + ' ';
+            });
+        }
+
+        function renderIngredientsList(recipe) {
+            const multiplier = currentPortion / basePortion;
+            const ingContainer = document.getElementById('modalIngredients');
+            ingContainer.innerHTML = '';
+            
+            recipe.ingredients.forEach((item, index) => {
+                const scaledItem = scaleIngredientText(item, multiplier);
+                const li = document.createElement('li');
+                li.className = "flex items-start gap-2 bg-orange-50/40 p-2 rounded-lg border border-orange-100/60";
+                li.innerHTML = `
+                    <input type="checkbox" id="ing-${index}" class="mt-1 accent-brand-500 h-4 w-4 rounded cursor-pointer">
+                    <label for="ing-${index}" class="cursor-pointer select-none leading-tight text-gray-700">${scaledItem}</label>
+                `;
+                ingContainer.appendChild(li);
+            });
+        }
+
+        function openModal(id) {
+            const recipe = recipes.find(r => r.id === id);
+            if (!recipe) return;
+
+            currentActiveRecipeId = id;
+            currentPortion = 4;
+            document.getElementById('portionCount').innerText = currentPortion;
+            updateModalFavoriteState();
+
+            document.getElementById('modalImg').src = recipe.image;
+            document.getElementById('modalTitle').innerText = recipe.name;
+            document.getElementById('modalRegionBadge').innerText = recipe.region;
+            
+            // Halal / Haram Modal Badge update
+            const isHalal = (!recipe.halalStatus || recipe.halalStatus === 'Halal');
+            const halalBadge = document.getElementById('modalHalalBadge');
+            halalBadge.innerText = isHalal ? 'HALAL' : 'HARAM';
+            halalBadge.className = `text-xs font-bold px-2.5 py-1 rounded-full shadow flex items-center gap-1 ${isHalal ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'}`;
+
+            document.getElementById('modalSubRegion').innerHTML = `<i class="fas fa-map-marker-alt"></i> Asal: ${recipe.subRegion}`;
+            document.getElementById('modalOrigin').innerText = recipe.origin;
+            document.getElementById('modalTips').innerText = recipe.tips;
+
+            const avg = calculateAverageRating(recipe);
+            const revCount = recipe.reviews ? recipe.reviews.length : 0;
+            document.getElementById('modalRatingVal').innerText = avg;
+            document.getElementById('modalReviewCount').innerText = revCount;
+
+            renderIngredientsList(recipe);
+
+            const stepsContainer = document.getElementById('modalSteps');
+            stepsContainer.innerHTML = '';
+            recipe.steps.forEach((step, index) => {
+                const li = document.createElement('li');
+                li.className = "flex gap-3 items-start bg-gray-50 p-3 rounded-xl";
+                li.innerHTML = `
+                    <span class="w-6 h-6 bg-brand-500 text-white rounded-full flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5 shadow-sm">
+                        ${index + 1}
+                    </span>
+                    <p class="text-gray-700 text-sm leading-relaxed">${step}</p>
+                `;
+                stepsContainer.appendChild(li);
+            });
+
+            renderReviewsList(recipe);
+            renderDiscussionList(recipe);
+            const modal = document.getElementById('recipeModal');
+            const container = document.getElementById('modalContainer');
+            modal.classList.remove('hidden');
+            setTimeout(() => { container.classList.remove('scale-95', 'opacity-0'); container.classList.add('scale-100', 'opacity-100'); }, 10);
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('recipeModal');
+            const container = document.getElementById('modalContainer');
+            container.classList.remove('scale-100', 'opacity-100');
+            container.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => { modal.classList.add('hidden'); document.body.style.overflow = 'auto'; currentActiveRecipeId = null; }, 250);
+        }
+
+        document.getElementById('recipeModal').addEventListener('click', (e) => { if (e.target.id === 'recipeModal') closeModal(); });
+        document.getElementById('addRecipeModal').addEventListener('click', (e) => {
+            if (e.target.id === 'addRecipeModal') closeAddRecipeModal();
+        });
+
+        function handleAddRecipe(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('newRecipeName').value.trim();
+            const region = document.getElementById('newRecipeRegion').value;
+            const subRegion = document.getElementById('newRecipeSubRegion').value.trim();
+            const halalStatus = document.getElementById('newRecipeHalalStatus').value;
+            let image = document.getElementById('newRecipeImage').value.trim();
+            const origin = document.getElementById('newRecipeOrigin').value.trim();
+            const ingredientsRaw = document.getElementById('newRecipeIngredients').value.trim();
+            const stepsRaw = document.getElementById('newRecipeSteps').value.trim();
+            const tips = document.getElementById('newRecipeTips').value.trim();
+
+            const ingredients = ingredientsRaw.split('\n').filter(item => item.trim() !== '');
+            const steps = stepsRaw.split('\n').filter(item => item.trim() !== '');
+
+            if (ingredients.length < 3) {
+                alert('Bahan-bahan harus diisi minimal 3 baris/poin takaran!');
+                return;
+            }
+            if (steps.length < 3) {
+                alert('Langkah memasak harus diisi minimal 3 tahapan instruksi!');
+                return;
+            }
+
+            if (!image) {
+                image = getSmartFoodImage(name, region);
+            }
+
+            const newRecipe = {
+                id: 'custom-' + Date.now(),
+                name: name,
+                region: region,
+                subRegion: subRegion,
+                halalStatus: halalStatus,
+                image: image,
+                cookingTime: '30-60 Min',
+                difficulty: 'Khas Daerah',
+                origin: origin,
+                ingredients: ingredients,
+                steps: steps,
+                tips: tips,
+                reviews: [],
+                discussions: [],
+                reports: 0
+            };
+
+            recipes.unshift(newRecipe);
+            localStorage.setItem('rasantara_recipes', JSON.stringify(recipes));
+
+            currentUser.points = (currentUser.points || 0) + 50;
+            updateSessionUser();
+            updateUserUI();
+
+            closeAddRecipeModal();
+            filterRecipes();
+            alert('Resep berhasil dipublikasikan! Anda mendapatkan +50 Poin Kontributor.');
+        }
+
+        async function apiRequest(path, options = {}) {
+            const token = localStorage.getItem('rasantara_token');
+            const headers = {'Content-Type':'application/json', ...(options.headers || {})};
+            if (token) headers.Authorization = 'Bearer ' + token;
+            const response = await fetch('/api' + path, {...options, headers});
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok) throw new Error(data.error || 'Permintaan gagal.');
+            return data;
+        }
+        function openComplaintModal() {
+            if (!currentUser) { alert('Masuk terlebih dahulu untuk mengirim komplain.'); openAuthModal(); return; }
+            const el = document.getElementById('complaintModal'); el.classList.remove('hidden'); el.classList.add('flex');
+        }
+        function closeComplaintModal() { const el=document.getElementById('complaintModal'); el.classList.add('hidden'); el.classList.remove('flex'); }
+        async function submitComplaint(e) {
+            e.preventDefault();
+            try { await apiRequest('/complaints',{method:'POST',body:JSON.stringify({subject:document.getElementById('complaintSubject').value.trim(),message:document.getElementById('complaintMessage').value.trim()})});
+                e.target.reset(); closeComplaintModal(); alert('Komplain berhasil disimpan di Cloudflare.');
+            } catch(err) { alert(err.message); }
+        }
+        async function loadPublicComments() {
+            const list=document.getElementById('publicCommentsList');
+            try { const data=await apiRequest('/comments'); list.innerHTML='';
+                if (!data.comments.length) { list.innerHTML='<p class="text-xs text-gray-400">Belum ada komentar. Jadilah yang pertama.</p>'; return; }
+                data.comments.forEach(c=>{ const card=document.createElement('article'); card.className='bg-orange-50/60 border border-orange-100 rounded-2xl p-4';
+                    const head=document.createElement('div'); head.className='text-xs font-bold text-brand-700 mb-1'; head.textContent=c.name+' · '+new Date(c.created_at).toLocaleString('id-ID');
+                    const body=document.createElement('p'); body.className='text-sm text-gray-700 whitespace-pre-wrap'; body.textContent=c.message; card.append(head,body); list.appendChild(card); });
+            } catch(err) { list.innerHTML='<p class="text-xs text-red-500">Komentar belum bisa dimuat. Backend Cloudflare belum aktif atau belum dikonfigurasi.</p>'; }
+        }
+        async function submitPublicComment(e) {
+            e.preventDefault(); if (!currentUser) { alert('Masuk terlebih dahulu untuk berkomentar.'); openAuthModal(); return; }
+            const input=document.getElementById('publicCommentInput');
+            try { await apiRequest('/comments',{method:'POST',body:JSON.stringify({message:input.value.trim()})}); input.value=''; await loadPublicComments(); }
+            catch(err) { alert(err.message); }
+        }
+        document.addEventListener('DOMContentLoaded', () => { loadPublicComments(); });
+    </script>
+</body>
+</html>
