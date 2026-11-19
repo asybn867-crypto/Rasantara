@@ -69,15 +69,13 @@
     if (document.getElementById("rsAdminModal")) return;
     const modal = document.createElement("div");
     modal.id = "rsAdminModal";
-    modal.innerHTML = '<section id="rsAdminPanel"><aside class="rs-admin-side"><div class="rs-admin-brand"><div class="rs-admin-brandmark">R</div><div class="rs-admin-brandtext"><strong>Rasantara</strong><small>Admin workspace</small></div></div><div class="rs-admin-navlabel">MENU UTAMA</div><nav class="rs-admin-tabs"><button data-view="history" data-icon="◷"><span>Riwayat Login</span></button><button data-view="complaints" data-icon="▤"><span>Komplain Masuk</span></button><button data-view="pending" data-icon="◈"><span>Persetujuan Resep</span></button><button data-view="recipes" data-icon="▧"><span>Kelola Resep</span></button><button data-view="users" data-icon="♙"><span>Kelola Akun</span></button><button data-view="comments" data-icon="☷"><span>Moderasi Komentar</span></button><button data-view="testReviews" data-icon="🧪"><span>Data Rating TEST</span></button></nav><div class="rs-admin-sidefoot">RASANTARA CONTROL CENTER<br>Data dikelola melalui Cloudflare D1</div></aside><div class="rs-admin-main"><header class="rs-admin-top"><div><small>RASANTARA / ADMIN</small><strong id="rsAdminPageTitle">Ringkasan Aktivitas</strong></div><button id="rsAdminClose" aria-label="Tutup">×</button></header><main class="rs-admin-work"><div class="rs-admin-welcome"><h3 id="rsAdminHeading">Selamat datang, Admin.</h3><p>Kelola aktivitas dan konten komunitas Rasantara dari satu tempat.</p></div><div id="rsAdminContent"><div class="rs-admin-empty">Pilih menu di sebelah kiri untuk mulai mengelola.</div></div></main></div></section>';
+    modal.innerHTML = '<section id="rsAdminPanel"><aside class="rs-admin-side"><div class="rs-admin-brand"><div class="rs-admin-brandmark">R</div><div class="rs-admin-brandtext"><strong>Rasantara</strong><small>Admin workspace</small></div></div><div class="rs-admin-navlabel">MENU UTAMA</div><nav class="rs-admin-tabs"><button data-view="history" data-icon="◷"><span>Riwayat Login</span></button><button data-view="complaints" data-icon="▤"><span>Komplain Masuk</span></button><button data-view="pending" data-icon="◈"><span>Persetujuan Resep</span></button><button data-view="recipes" data-icon="▧"><span>Kelola Resep</span></button><button data-view="users" data-icon="♙"><span>Kelola Akun</span></button><button data-view="comments" data-icon="☷"><span>Moderasi Komentar</span></button></nav><div class="rs-admin-sidefoot">RASANTARA CONTROL CENTER<br>Data dikelola melalui Cloudflare D1</div></aside><div class="rs-admin-main"><header class="rs-admin-top"><div><small>RASANTARA / ADMIN</small><strong id="rsAdminPageTitle">Ringkasan Aktivitas</strong></div><button id="rsAdminClose" aria-label="Tutup">×</button></header><main class="rs-admin-work"><div class="rs-admin-welcome"><h3 id="rsAdminHeading">Selamat datang, Admin.</h3><p>Kelola aktivitas dan konten komunitas Rasantara dari satu tempat.</p></div><div id="rsAdminContent"><div class="rs-admin-empty">Pilih menu di sebelah kiri untuk mulai mengelola.</div></div></main></div></section>';
     document.body.appendChild(modal);
     modal.addEventListener("click", e => {if(e.target===modal || e.target.id==="rsAdminClose")modal.classList.remove("open")});
     modal.querySelectorAll("[data-view]").forEach(b=>b.addEventListener("click",()=>{modal.querySelectorAll("[data-view]").forEach(x=>x.classList.toggle("active",x===b));loadAdminView(b.dataset.view)}));
     modal.addEventListener("click",async e=>{
       const delComplaint=e.target.closest("[data-delete-complaint]");
       if(delComplaint){if(!confirm("Hapus komplain ini secara permanen?"))return;delComplaint.disabled=true;try{await request("/admin/complaints/"+encodeURIComponent(delComplaint.dataset.deleteComplaint),{method:"DELETE"});await loadAdminView("complaints");}catch(err){alert(err.message);delComplaint.disabled=false;}return;}
-      const delTest=e.target.closest("[data-delete-test-review]");
-      if(delTest){if(!confirm("Hapus data rating TEST ini?"))return;delTest.disabled=true;try{await request("/admin/test-reviews/"+encodeURIComponent(delTest.dataset.deleteTestReview),{method:"DELETE"});await loadAdminView("testReviews");}catch(err){alert(err.message);delTest.disabled=false;}return;}
       const delComment=e.target.closest("[data-delete-comment]");
       if(delComment){if(!confirm("Hapus komentar ini secara permanen?"))return;delComment.disabled=true;try{await request("/admin/comments/"+encodeURIComponent(delComment.dataset.deleteComment),{method:"DELETE"});await loadAdminView("comments");}catch(err){alert(err.message);delComment.disabled=false;}return;}
       const del=e.target.closest("[data-delete]"),ban=e.target.closest("[data-ban]"),unban=e.target.closest("[data-unban]");
@@ -99,17 +97,14 @@
   }
   async function loadAdminView(view) {
     const box=document.getElementById("rsAdminContent");
-    const titles={history:"Riwayat Login",complaints:"Komplain Masuk",pending:"Persetujuan Resep",recipes:"Kelola Resep",users:"Kelola Akun",comments:"Moderasi Komentar",testReviews:"Data Rating TEST"};
+    const titles={history:"Riwayat Login",complaints:"Komplain Masuk",pending:"Persetujuan Resep",recipes:"Kelola Resep",users:"Kelola Akun",comments:"Moderasi Komentar"};
     const title=titles[view]||"Panel Admin";
     const titleEl=document.getElementById("rsAdminPageTitle"),heading=document.getElementById("rsAdminHeading");
     if(titleEl)titleEl.textContent=title;
     if(heading)heading.textContent=title;
     box.innerHTML='<div class="rs-admin-empty">Memuat data...</div>';
     try {
-      if(view==="testReviews") {
-        const data=await request("/admin/test-reviews");
-        box.innerHTML=data.comments.length?data.comments.map(c=>'<article class="rs-admin-entry"><b>🧪 DATA TEST · '+escapeHtml(c.recipe_id)+'</b><div style="color:#78716c;font-size:11px;margin:4px 0">'+escapeHtml(c.name)+' · '+new Date(Number(c.created_at)).toLocaleString("id-ID")+'</div><div style="color:#d97706;margin:4px 0">Rating: '+Number(c.rating)+'/5</div><p style="white-space:pre-wrap;margin:8px 0">'+escapeHtml(c.comment)+'</p><button data-delete-test-review="'+escapeHtml(c.id)+'" style="background:#dc2626;color:white;padding:8px 12px;border-radius:9px;font-weight:700">Hapus data TEST</button></article>').join(""):'<p>Belum ada data rating TEST.</p>';
-      } else if(view==="comments") {
+      if(view==="comments") {
         const data=await request("/admin/comments");
         box.innerHTML=data.comments.length?data.comments.map(c=>'<article class="rs-admin-entry"><b>'+escapeHtml(c.name)+'</b><div style="color:#78716c;font-size:11px;margin:4px 0">'+escapeHtml(c.email)+' · '+escapeHtml(c.recipe_id)+' · '+new Date(Number(c.created_at)).toLocaleString("id-ID")+'</div><div style="color:#d97706;margin:4px 0">Rating: '+Number(c.rating)+'/5</div><p style="white-space:pre-wrap;margin:8px 0">'+escapeHtml(c.comment)+'</p><button data-delete-comment="'+escapeHtml(c.id)+'" style="background:#dc2626;color:white;padding:8px 12px;border-radius:9px;font-weight:700">Hapus komentar</button></article>').join(""):'<p>Belum ada komentar.</p>';
       } else if(view==="users") {
