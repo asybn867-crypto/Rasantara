@@ -9,3 +9,14 @@ CREATE INDEX IF NOT EXISTS comments_created ON comments(created_at DESC);
 
 CREATE TABLE IF NOT EXISTS login_history(id TEXT PRIMARY KEY,email TEXT NOT NULL,success INTEGER NOT NULL,created_at INTEGER NOT NULL);
 CREATE INDEX IF NOT EXISTS login_history_created ON login_history(created_at DESC);
+
+CREATE TABLE IF NOT EXISTS recipe_reviews(
+ id TEXT PRIMARY KEY,
+ recipe_id TEXT NOT NULL,
+ user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+ rating INTEGER NOT NULL CHECK(rating BETWEEN 1 AND 5),
+ comment TEXT NOT NULL,
+ created_at INTEGER NOT NULL,
+ UNIQUE(recipe_id,user_id)
+);
+CREATE INDEX IF NOT EXISTS recipe_reviews_recipe_created ON recipe_reviews(recipe_id,created_at DESC);
