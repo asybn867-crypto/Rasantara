@@ -35,29 +35,25 @@
     document.head.appendChild(style);
   }
   function addOrientation() {
-    if (document.getElementById("rsOrientation")) return;
-    const bar = document.createElement("div");
-    bar.id = "rsOrientation";
-    bar.innerHTML = '<button type="button" data-mode="portrait">▯ Potret</button><button type="button" data-mode="landscape">▭ Lanskap</button>';
-    document.body.appendChild(bar);
-    const setMode = mode => {
-      document.body.classList.toggle("rs-portrait", mode === "portrait");
-      document.body.classList.toggle("rs-landscape", mode === "landscape");
-      bar.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.mode === mode)));
-      localStorage.setItem("rasantara_layout_mode", mode);
-    };
-    bar.addEventListener("click", e => {const b=e.target.closest("button[data-mode]");if(b)setMode(b.dataset.mode)});
-    setMode(localStorage.getItem("rasantara_layout_mode") || (matchMedia("(max-width: 640px)").matches ? "portrait" : "landscape"));
+    const ua = navigator.userAgent || "";
+    const isIPad = /iPad/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    const isPhone = !isIPad && (/iPhone|iPod|Android.*Mobile|Windows Phone/i.test(ua));
+    const mode = isPhone ? "portrait" : "landscape";
+    document.body.classList.toggle("rs-portrait", mode === "portrait");
+    document.body.classList.toggle("rs-landscape", mode === "landscape");
+    document.documentElement.dataset.rasantaraLayout = mode;
   }
   function addAdminPanel() {
     if (document.getElementById("rsAdminModal")) return;
     const modal = document.createElement("div");
     modal.id = "rsAdminModal";
-    modal.innerHTML = '<section id="rsAdminPanel"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><div><h2 style="font:700 22px Georgia;color:#292524">Panel Admin Rasantara</h2><p style="font-size:12px;color:#78716c">Data tersimpan di Cloudflare D1.</p></div><button id="rsAdminClose" aria-label="Tutup" style="font-size:24px;color:#78716c">×</button></div><nav class="rs-admin-tabs"><button data-view="history">Riwayat Login</button><button data-view="complaints">Komplain Masuk</button><button data-view="pending">Persetujuan Resep</button><button data-view="recipes">Kelola Resep</button><button data-view="users">Kelola Akun</button></nav><div id="rsAdminContent">Pilih menu.</div></section>';
+    modal.innerHTML = '<section id="rsAdminPanel"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><div><h2 style="font:700 22px Georgia;color:#292524">Panel Admin Rasantara</h2><p style="font-size:12px;color:#78716c">Data tersimpan di Cloudflare D1.</p></div><button id="rsAdminClose" aria-label="Tutup" style="font-size:24px;color:#78716c">×</button></div><nav class="rs-admin-tabs"><button data-view="history">Riwayat Login</button><button data-view="complaints">Komplain Masuk</button><button data-view="pending">Persetujuan Resep</button><button data-view="recipes">Kelola Resep</button><button data-view="users">Kelola Akun</button><button data-view="comments">Moderasi Komentar</button></nav><div id="rsAdminContent">Pilih menu.</div></section>';
     document.body.appendChild(modal);
     modal.addEventListener("click", e => {if(e.target===modal || e.target.id==="rsAdminClose")modal.classList.remove("open")});
     modal.querySelectorAll("[data-view]").forEach(b=>b.addEventListener("click",()=>loadAdminView(b.dataset.view)));
     modal.addEventListener("click",async e=>{
+      const delComment=e.target.closest("[data-delete-comment]");
+      if(delComment){if(!confirm("Hapus komentar ini secara permanen?"))return;delComment.disabled=true;try{await request("/admin/comments/"+encodeURIComponent(delComment.dataset.deleteComment),{method:"DELETE"});await loadAdminView("comments");}catch(err){alert(err.message);delComment.disabled=false;}return;}
       const del=e.target.closest("[data-delete]"),ban=e.target.closest("[data-ban]"),unban=e.target.closest("[data-unban]");
       if(del){if(!confirm("Hapus resep ini secara permanen?"))return;del.disabled=true;try{await request("/admin/recipes/"+encodeURIComponent(del.dataset.delete),{method:"DELETE"});await loadAdminView("recipes");}catch(err){alert(err.message);del.disabled=false;}return;}
       if(ban){const reason=prompt("Alasan pemblokiran akun:");if(reason===null)return;ban.disabled=true;try{await request("/admin/users/"+encodeURIComponent(ban.dataset.ban)+"/ban",{method:"POST",body:JSON.stringify({reason})});await loadAdminView("users");}catch(err){alert(err.message);ban.disabled=false;}return;}
@@ -77,7 +73,10 @@
     const box=document.getElementById("rsAdminContent");
     box.textContent="Memuat data...";
     try {
-      if(view==="users") {
+      if(view==="comments") {
+        const data=await request("/admin/comments");
+        box.innerHTML=data.comments.length?data.comments.map(c=>'<article class="rs-admin-entry"><b>'+escapeHtml(c.name)+'</b><div style="color:#78716c;font-size:11px;margin:4px 0">'+escapeHtml(c.email)+' · '+escapeHtml(c.recipe_id)+' · '+new Date(Number(c.created_at)).toLocaleString("id-ID")+'</div><div style="color:#d97706;margin:4px 0">Rating: '+Number(c.rating)+'/5</div><p style="white-space:pre-wrap;margin:8px 0">'+escapeHtml(c.comment)+'</p><button data-delete-comment="'+escapeHtml(c.id)+'" style="background:#dc2626;color:white;padding:8px 12px;border-radius:9px;font-weight:700">Hapus komentar</button></article>').join(""):'<p>Belum ada komentar.</p>';
+      } else if(view==="users") {
         const data=await request("/admin/users");
         box.innerHTML=data.users.length?data.users.map(u=>'<article class="rs-admin-entry"><b>'+escapeHtml(u.name)+'</b><div style="color:#78716c;font-size:11px;margin:4px 0">'+escapeHtml(u.email)+' · '+escapeHtml(u.role)+'</div><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><span style="color:'+(u.banned_at?'#dc2626':'#15803d')+'">'+(u.banned_at?'Diblokir: '+escapeHtml(u.ban_reason||'-'):'Aktif')+'</span>'+(u.role==='admin'?'':'<button '+(u.banned_at?'data-unban="'+escapeHtml(u.id)+'"':'data-ban="'+escapeHtml(u.id)+'"')+' style="background:'+(u.banned_at?'#15803d':'#dc2626')+';color:white;padding:7px 11px;border-radius:8px;font-weight:700">'+(u.banned_at?'Buka blokir':'Ban akun')+'</button>')+'</div></article>').join(""):'<p>Belum ada akun.</p>';
       } else if(view==="recipes") {
