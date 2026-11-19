@@ -857,7 +857,7 @@
                     body: JSON.stringify({email, password, ...(wasRegistering ? {name} : {})})
                 });
                 const data = await response.json().catch(() => ({}));
-                if (!response.ok) throw new Error(data.error || 'Autentikasi gagal.');
+                if (!response.ok) throw new Error(data.detail ? (data.error + ' (' + data.detail + ')') : (data.error || 'Autentikasi gagal.'));
                 if (!data.token || !data.user) throw new Error('Respons server tidak lengkap.');
                 localStorage.setItem('rasantara_token', data.token);
                 currentUser = {...data.user, favorites: [], points: 0};
