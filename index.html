@@ -1277,7 +1277,7 @@
             if (token) headers.Authorization = 'Bearer ' + token;
             const response = await fetch('https://rasantara-api.asybn867.workers.dev/api' + path, {...options, headers});
             const data = await response.json().catch(() => ({}));
-            if (!response.ok) throw new Error(data.error || 'Permintaan gagal.');
+            if (!response.ok) throw new Error(data.detail ? (data.error + ' (' + data.detail + ')') : (data.error || 'Permintaan gagal.'));
             return data;
         }
         async function loadApprovedCommunityRecipes() {
