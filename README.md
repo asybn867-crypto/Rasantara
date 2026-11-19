@@ -39,3 +39,16 @@ Konfigurasi dan source code backend akan ditambahkan ke repository ini secara be
 ## Repository
 
 https://github.com/asybn867-crypto/Rasantara
+
+
+## Backend Cloudflare (implementasi)
+
+Source backend tersedia pada `worker.js`, skema database pada `schema.sql`, dan konfigurasi pada `wrangler.toml`.
+
+1. Buat database D1 bernama `rasantara-db` di Cloudflare.
+2. Ganti `database_id` di `wrangler.toml` dengan ID D1 milikmu.
+3. Ganti `ADMIN_EMAIL` dengan email akun admin yang akan didaftarkan pertama kali.
+4. Jalankan `npx wrangler d1 execute rasantara-db --remote --file=schema.sql`.
+5. Deploy dengan `npx wrangler deploy`.
+
+API menyediakan registrasi/login, komentar publik, penyimpanan komplain di D1, dan endpoint daftar komplain khusus admin. Jangan memasukkan password atau token ke repository.
