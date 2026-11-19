@@ -20,7 +20,7 @@ async function rateLimitLogin(env,key,now){
  return !blocked;
 }
 async function ensureRecipeReviews(env){await env.DB.prepare("CREATE TABLE IF NOT EXISTS recipe_reviews(id TEXT PRIMARY KEY,recipe_id TEXT NOT NULL,user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,rating INTEGER NOT NULL CHECK(rating BETWEEN 1 AND 5),comment TEXT NOT NULL,created_at INTEGER NOT NULL,UNIQUE(recipe_id,user_id))").run();await env.DB.prepare("CREATE INDEX IF NOT EXISTS recipe_reviews_recipe_created ON recipe_reviews(recipe_id,created_at DESC)").run();}
-async function ensureRecipeSubmissions(env){await env.DB.prepare("CREATE TABLE IF NOT EXISTS recipe_submissions(id TEXT PRIMARY KEY,user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,recipe_json TEXT NOT NULL,status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','approved','rejected')),created_at INTEGER NOT NULL,reviewed_at INTEGER)").run();await env.DB.prepare("CREATE INDEX IF NOT EXISTS recipe_submissions_status_created ON recipe_submissions(status,created_at DESC)").run();}
+async function ensureRecipeImages(env){await env.DB.prepare("CREATE TABLE IF NOT EXISTS recipe_images(id TEXT PRIMARY KEY,mime_type TEXT NOT NULL,image_data BLOB NOT NULL,created_at INTEGER NOT NULL)").run();}\nasync function ensureRecipeSubmissions(env){await env.DB.prepare("CREATE TABLE IF NOT EXISTS recipe_submissions(id TEXT PRIMARY KEY,user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,recipe_json TEXT NOT NULL,status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','approved','rejected')),created_at INTEGER NOT NULL,reviewed_at INTEGER)").run();await env.DB.prepare("CREATE INDEX IF NOT EXISTS recipe_submissions_status_created ON recipe_submissions(status,created_at DESC)").run();}
 export default {async fetch(req,env){if(req.method==="OPTIONS")return new Response(null,{headers:cors});const url=new URL(req.url),path=url.pathname.startsWith("/api")?url.pathname.slice(4):url.pathname;try{
 if(path==="/health")return json({ok:true});
 await ensureSecurity(env);
@@ -30,22 +30,21 @@ if(path==="/auth/register"&&req.method==="POST"){const b=await req.json(),name=c
 if(path==="/auth/login"&&req.method==="POST"){const b=await req.json(),email=clean(b.email).toLowerCase(),now=Date.now(),ip=req.headers.get("CF-Connecting-IP")||"unknown",key=await digest(email+"|"+ip);if(!await rateLimitLogin(env,key,now))return json({error:"Terlalu banyak percobaan login. Coba lagi dalam 15 menit."},429);const u=await env.DB.prepare("SELECT * FROM users WHERE email=?").bind(email).first(),valid=!!u&&!!u.password_salt&&await hashPassword(String(b.password||""),u.password_salt)===u.password_hash;try{await env.DB.prepare("INSERT INTO login_history(id,email,success,created_at) VALUES(?,?,?,?)").bind(crypto.randomUUID(),email,valid&&!u.banned_at?1:0,now).run();}catch(logError){console.error("Login history write failed:",logError);}if(!valid)return json({error:"Email atau kata sandi salah."},401);if(u.banned_at)return json({error:"Akun diblokir admin.",detail:u.ban_reason||"Hubungi pengelola."},403);await env.DB.prepare("DELETE FROM login_rate_limits WHERE key=?").bind(key).run();return makeSession({id:u.id,name:u.name,email:u.email,role:u.role},env);}
 if(path==="/images/upload"&&req.method==="POST"){
  const u=await getUser(req,env);if(!u)return json({error:"Login diperlukan untuk mengunggah gambar."},401);
- if(!env.IMAGES)return json({error:"Penyimpanan gambar belum dikonfigurasi. Hubungi admin."},503);
+ await ensureRecipeImages(env);
  const form=await req.formData(),file=form.get("image");
  if(!file||typeof file.arrayBuffer!=="function")return json({error:"File gambar tidak ditemukan."},400);
- const allowed={"image/jpeg":"jpg","image/png":"png","image/webp":"webp","image/gif":"gif"};
- if(!allowed[file.type]||file.size<1||file.size>5*1024*1024)return json({error:"Format gambar harus JPG, PNG, WEBP, atau GIF dan maksimal 5 MB."},400);
- const key="recipes/"+crypto.randomUUID()+"."+allowed[file.type];
- await env.IMAGES.put(key,await file.arrayBuffer(),{httpMetadata:{contentType:file.type,cacheControl:"public, max-age=31536000, immutable"}});
- return json({ok:true,key,url:new URL("/images/"+key,req.url).toString()});
+ const allowed={"image/jpeg":1,"image/png":1,"image/webp":1,"image/gif":1};
+ if(!allowed[file.type]||file.size<1||file.size>1400*1024)return json({error:"Format gambar harus JPG, PNG, WEBP, atau GIF dan maksimal 1,4 MB."},400);
+ const id=crypto.randomUUID(),bytes=new Uint8Array(await file.arrayBuffer());
+ await env.DB.prepare("INSERT INTO recipe_images(id,mime_type,image_data,created_at) VALUES(?,?,?,?)").bind(id,file.type,bytes,Date.now()).run();
+ return json({ok:true,url:new URL("/api/images/"+id,req.url).toString()});
 }
-if(path.startsWith("/images/")&&req.method==="GET"){
- if(!env.IMAGES)return new Response("Image storage is not configured.",{status:503,headers:cors});
- const key=path.slice("/images/".length);
- if(!/^recipes\/[a-f0-9-]+\.(jpg|png|webp|gif)$/.test(key))return new Response("Not found.",{status:404,headers:cors});
- const object=await env.IMAGES.get(key);if(!object)return new Response("Not found.",{status:404,headers:cors});
- const headers=new Headers(cors);object.writeHttpMetadata(headers);headers.set("etag",object.httpEtag);headers.set("Cache-Control","public, max-age=31536000, immutable");
- return new Response(object.body,{headers});
+const imageMatch=path.match(/^\/images\/([a-f0-9-]+)$/);
+if(imageMatch&&req.method==="GET"){
+ await ensureRecipeImages(env);
+ const row=await env.DB.prepare("SELECT mime_type,image_data FROM recipe_images WHERE id=?").bind(imageMatch[1]).first();
+ if(!row)return new Response("Not found.",{status:404,headers:cors});
+ return new Response(row.image_data,{headers:{...cors,"Content-Type":row.mime_type,"Cache-Control":"public, max-age=31536000, immutable","X-Content-Type-Options":"nosniff"}});
 }
 if(path==="/recipes/public"&&req.method==="GET"){await ensureRecipeSubmissions(env);const {results}=await env.DB.prepare("SELECT id,recipe_json FROM recipe_submissions WHERE status='approved' ORDER BY created_at DESC LIMIT 200").all();return json({recipes:results.map(r=>JSON.parse(r.recipe_json))});}
 if(path==="/recipes/submit"&&req.method==="POST"){await ensureRecipeSubmissions(env);const u=await getUser(req,env);if(!u)return json({error:"Login diperlukan untuk mengirim resep."},401);const b=await req.json(),recipe=b.recipe||{},name=clean(recipe.name);if(name.length<2||name.length>120||!Array.isArray(recipe.ingredients)||recipe.ingredients.length<3||!Array.isArray(recipe.steps)||recipe.steps.length<3)return json({error:"Data resep belum lengkap."},400);const id="community-"+crypto.randomUUID();recipe.id=id;await env.DB.prepare("INSERT INTO recipe_submissions(id,user_id,recipe_json,status,created_at) VALUES(?,?,?,'pending',?)").bind(id,u.id,JSON.stringify(recipe),Date.now()).run();return json({ok:true,id,status:"pending"});}
