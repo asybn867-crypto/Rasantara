@@ -47,7 +47,7 @@ Source backend tersedia pada `worker.js`, skema database pada `schema.sql`, dan 
 
 1. Buat database D1 bernama `rasantara-db` di Cloudflare.
 2. Ganti `database_id` di `wrangler.toml` dengan ID D1 milikmu.
-3. Ganti `ADMIN_EMAIL` dengan email akun admin yang akan didaftarkan pertama kali.
+3. Daftarkan akun admin melalui halaman login seperti pengguna biasa, lalu promosikan secara manual dari D1 Console: `UPDATE users SET role = 'admin' WHERE email = 'email-admin-kamu';`. Jangan memberi role admin melalui form publik.
 4. Jalankan `npx wrangler d1 execute rasantara-db --remote --file=schema.sql`.
 5. Deploy dengan `npx wrangler deploy`.
 
