@@ -1,0 +1,7 @@
+**/.git
+**/.wrangler
+worker.js
+schema.sql
+wrangler.toml
+*.zip
+README.md
