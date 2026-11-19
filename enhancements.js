@@ -74,6 +74,8 @@
     modal.addEventListener("click", e => {if(e.target===modal || e.target.id==="rsAdminClose")modal.classList.remove("open")});
     modal.querySelectorAll("[data-view]").forEach(b=>b.addEventListener("click",()=>{modal.querySelectorAll("[data-view]").forEach(x=>x.classList.toggle("active",x===b));loadAdminView(b.dataset.view)}));
     modal.addEventListener("click",async e=>{
+      const delComplaint=e.target.closest("[data-delete-complaint]");
+      if(delComplaint){if(!confirm("Hapus komplain ini secara permanen?"))return;delComplaint.disabled=true;try{await request("/admin/complaints/"+encodeURIComponent(delComplaint.dataset.deleteComplaint),{method:"DELETE"});await loadAdminView("complaints");}catch(err){alert(err.message);delComplaint.disabled=false;}return;}
       const delComment=e.target.closest("[data-delete-comment]");
       if(delComment){if(!confirm("Hapus komentar ini secara permanen?"))return;delComment.disabled=true;try{await request("/admin/comments/"+encodeURIComponent(delComment.dataset.deleteComment),{method:"DELETE"});await loadAdminView("comments");}catch(err){alert(err.message);delComment.disabled=false;}return;}
       const del=e.target.closest("[data-delete]"),ban=e.target.closest("[data-ban]"),unban=e.target.closest("[data-unban]");
@@ -117,7 +119,7 @@
         box.innerHTML=data.history.length?data.history.map(r=>'<article class="rs-admin-entry"><b>'+escapeHtml(r.email)+'</b><div style="display:flex;justify-content:space-between;gap:12px;margin-top:5px"><span style="color:'+(r.success?'#047857':'#dc2626')+'">'+(r.success?'Login berhasil':'Login gagal')+'</span><span style="color:#78716c">'+new Date(Number(r.created_at)).toLocaleString("id-ID")+'</span></div></article>').join(""):'<p style="color:#78716c;font-size:13px">Belum ada riwayat login.</p>';
       } else {
         const data=await request("/admin/complaints");
-        box.innerHTML=data.complaints.length?data.complaints.map(c=>'<article class="rs-admin-entry"><b>'+escapeHtml(c.subject)+'</b><div style="color:#78716c;font-size:11px;margin:4px 0">'+escapeHtml(c.name)+' · '+escapeHtml(c.email)+' · '+new Date(Number(c.created_at)).toLocaleString("id-ID")+'</div><p style="white-space:pre-wrap;margin:8px 0">'+escapeHtml(c.message)+'</p><span style="font-weight:700;color:#c2410c">Status: '+escapeHtml(c.status)+'</span></article>').join(""):'<p style="color:#78716c;font-size:13px">Belum ada komplain masuk.</p>';
+        box.innerHTML='<p style="font-size:12px;color:#78716c;margin-bottom:12px">Komplain berumur lebih dari 7 hari dihapus otomatis setiap Senin pukul 00.00 UTC.</p>'+(data.complaints.length?data.complaints.map(c=>'<article class="rs-admin-entry"><b>'+escapeHtml(c.subject)+'</b><div style="color:#78716c;font-size:11px;margin:4px 0">'+escapeHtml(c.name)+' · '+escapeHtml(c.email)+' · '+new Date(Number(c.created_at)).toLocaleString("id-ID")+'</div><p style="white-space:pre-wrap;margin:8px 0">'+escapeHtml(c.message)+'</p><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><span style="font-weight:700;color:#c2410c">Status: '+escapeHtml(c.status)+'</span><button data-delete-complaint="'+escapeHtml(c.id)+'" style="background:#dc2626;color:white;padding:8px 12px;border-radius:9px;font-weight:700">Hapus komplain</button></div></article>').join(''):'<p style="color:#78716c;font-size:13px">Belum ada komplain masuk.</p>');
       }
     } catch(e) {box.textContent=e.message}
   }
