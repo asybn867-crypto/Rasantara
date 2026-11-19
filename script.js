@@ -1,5 +1,5 @@
 /* Rasantara API integration. Original page markup and styling are preserved. */
-const RASANTARA_API = "https://YOUR-WORKER-NAME.YOUR-SUBDOMAIN.workers.dev";
+const RASANTARA_API = "https://rasantara-api.asybn867.workers.dev";
 const RASANTARA_TOKEN_KEY = "rasantara_api_token";
 const apiToken = () => sessionStorage.getItem(RASANTARA_TOKEN_KEY);
 async function api(path, options = {}) {
