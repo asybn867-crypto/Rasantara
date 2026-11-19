@@ -6,3 +6,6 @@ CREATE TABLE IF NOT EXISTS complaints(id TEXT PRIMARY KEY,user_id TEXT NOT NULL 
 CREATE INDEX IF NOT EXISTS complaints_created ON complaints(created_at DESC);
 CREATE TABLE IF NOT EXISTS comments(id TEXT PRIMARY KEY,user_id TEXT NOT NULL REFERENCES users(id),message TEXT NOT NULL,created_at INTEGER NOT NULL,is_hidden INTEGER NOT NULL DEFAULT 0);
 CREATE INDEX IF NOT EXISTS comments_created ON comments(created_at DESC);
+
+CREATE TABLE IF NOT EXISTS login_history(id TEXT PRIMARY KEY,email TEXT NOT NULL,success INTEGER NOT NULL,created_at INTEGER NOT NULL);
+CREATE INDEX IF NOT EXISTS login_history_created ON login_history(created_at DESC);
