@@ -12,3 +12,7 @@ binding = "DB"
 database_name = "rasantara-db"
 database_id = "34af0613-ff48-4f35-978c-6811897010ca"
 
+
+[[r2_buckets]]
+binding = "IMAGES"
+bucket_name = "rasantara-images"
