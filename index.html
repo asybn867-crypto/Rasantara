@@ -1290,6 +1290,30 @@
             if (e.target.id === 'addRecipeModal') closeAddRecipeModal();
         });
 
+        function openAddRecipeModal() {
+            const modal = document.getElementById('addRecipeModal');
+            const container = document.getElementById('addModalContainer');
+            if (!modal || !container) return;
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            requestAnimationFrame(() => {
+                container.classList.remove('scale-95', 'opacity-0');
+                container.classList.add('scale-100', 'opacity-100');
+            });
+        }
+
+        function closeAddRecipeModal() {
+            const modal = document.getElementById('addRecipeModal');
+            const container = document.getElementById('addModalContainer');
+            if (!modal || !container) return;
+            container.classList.remove('scale-100', 'opacity-100');
+            container.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }, 250);
+        }
+
         async function handleAddRecipe(e) {
             e.preventDefault();
             if (!currentUser) { alert('Masuk terlebih dahulu untuk mengirim resep.'); openAuthModal(); return; }
