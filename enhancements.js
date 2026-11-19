@@ -129,6 +129,8 @@
     const existing=document.getElementById("rsAdminActions");
     if(!user || user.role!=="admin") {
       if(existing)existing.remove();
+      const oldLogout=document.querySelector('#userProfileNav button[onclick="handleLogout()"]');
+      if(oldLogout)oldLogout.style.display="";
       return;
     }
     if(existing)return;
