@@ -1256,8 +1256,8 @@
             const halalStatus = document.getElementById('newRecipeHalalStatus').value;
             const image = document.getElementById('newRecipeImage').value.trim() || getSmartFoodImage(name, region);
             const origin = document.getElementById('newRecipeOrigin').value.trim();
-            const ingredients = document.getElementById('newRecipeIngredients').value.trim().split('\\n').filter(x => x.trim());
-            const steps = document.getElementById('newRecipeSteps').value.trim().split('\\n').filter(x => x.trim());
+            const ingredients = document.getElementById('newRecipeIngredients').value.trim().split('\n').filter(x => x.trim());
+            const steps = document.getElementById('newRecipeSteps').value.trim().split('\n').filter(x => x.trim());
             const tips = document.getElementById('newRecipeTips').value.trim();
             if (ingredients.length < 3 || steps.length < 3) { alert('Bahan dan langkah memasak masing-masing minimal 3 baris.'); return; }
             const recipe = {name,region,subRegion,halalStatus,image,cookingTime:'30-60 Menit',difficulty:'Khas Daerah',origin,ingredients,steps,tips,reviews:[],discussions:[],reports:0};
