@@ -1284,8 +1284,8 @@
             const file = event.target.files[0];
             const preview = document.getElementById('newRecipeImagePreview');
             if (!file) { preview.src = ''; preview.classList.add('hidden'); return; }
-            if (!['image/jpeg','image/png','image/webp','image/gif'].includes(file.type) || file.size > 5 * 1024 * 1024) {
-                alert('Pilih gambar JPG, PNG, WEBP, atau GIF dengan ukuran maksimal 5 MB.');
+            if (!['image/jpeg','image/png','image/webp','image/gif'].includes(file.type) || file.size > 1400 * 1024) {
+                alert('Pilih gambar JPG, PNG, WEBP, atau GIF dengan ukuran maksimal 1,4 MB.');
                 event.target.value = '';
                 preview.src = '';
                 preview.classList.add('hidden');
@@ -1338,8 +1338,8 @@
             submit.disabled = true; submit.textContent = 'Mengirim...';
             try {
                 if (imageFile) {
-                    if (!['image/jpeg','image/png','image/webp','image/gif'].includes(imageFile.type) || imageFile.size > 5 * 1024 * 1024) {
-                        throw new Error('Pilih gambar JPG, PNG, WEBP, atau GIF dengan ukuran maksimal 5 MB.');
+                    if (!['image/jpeg','image/png','image/webp','image/gif'].includes(imageFile.type) || imageFile.size > 1400 * 1024) {
+                        throw new Error('Pilih gambar JPG, PNG, WEBP, atau GIF dengan ukuran maksimal 1,4 MB.');
                     }
                     const token = localStorage.getItem('rasantara_token');
                     const formData = new FormData();
