@@ -20,3 +20,6 @@ CREATE TABLE IF NOT EXISTS recipe_reviews(
  UNIQUE(recipe_id,user_id)
 );
 CREATE INDEX IF NOT EXISTS recipe_reviews_recipe_created ON recipe_reviews(recipe_id,created_at DESC);
+
+CREATE TABLE IF NOT EXISTS recipe_submissions(id TEXT PRIMARY KEY,user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,recipe_json TEXT NOT NULL,status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','approved','rejected')),created_at INTEGER NOT NULL,reviewed_at INTEGER);
+CREATE INDEX IF NOT EXISTS recipe_submissions_status_created ON recipe_submissions(status,created_at DESC);
