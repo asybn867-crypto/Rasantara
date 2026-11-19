@@ -479,7 +479,7 @@
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">Status Kehalalan *</label>
                         <select id="newRecipeHalalStatus" required class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm bg-white">
                             <option value="Halal">Halal</option>
-                            <option value="Haram">Haram (Non-Halal)</option>
+                            <option value="Non-Halal">Non-Halal</option>
                         </select>
                     </div>
                 </div>
@@ -1049,7 +1049,7 @@
                         </span>
                         <!-- Halal / Haram Badge on Card -->
                         <span class="absolute top-3 left-28 ${isHalal ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'} text-[10px] font-extrabold px-2.5 py-1 rounded-full shadow tracking-wide">
-                            ${isHalal ? 'HALAL' : 'HARAM'}
+                            ${isHalal ? 'HALAL' : 'NON-HALAL'}
                         </span>
 
                         <button onclick="toggleFavorite('${recipe.id}')" class="fav-btn absolute top-3 right-3 w-9 h-9 rounded-full bg-white/80 hover:bg-white backdrop-blur-md flex items-center justify-center shadow transition text-lg">
@@ -1221,7 +1221,7 @@
             // Halal / Haram Modal Badge update
             const isHalal = (!recipe.halalStatus || recipe.halalStatus === 'Halal');
             const halalBadge = document.getElementById('modalHalalBadge');
-            halalBadge.innerText = isHalal ? 'HALAL' : 'HARAM';
+            halalBadge.innerText = isHalal ? 'HALAL' : 'NON-HALAL';
             halalBadge.className = `text-xs font-bold px-2.5 py-1 rounded-full shadow flex items-center gap-1 ${isHalal ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'}`;
 
             document.getElementById('modalSubRegion').innerHTML = `<i class="fas fa-map-marker-alt"></i> Asal: ${recipe.subRegion}`;
