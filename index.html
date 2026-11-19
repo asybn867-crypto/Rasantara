@@ -765,6 +765,7 @@
             updateUserUI();
             renderRecipes(recipes);
             refreshRatingSummaries();
+            loadApprovedCommunityRecipes();
         });
 
         function getUserBadge(points) {
@@ -1279,6 +1280,16 @@
             if (!response.ok) throw new Error(data.error || 'Permintaan gagal.');
             return data;
         }
+        async function loadApprovedCommunityRecipes() {
+            try {
+                const data = await apiRequest("/recipes/public");
+                const approved = (data.recipes || []).filter(r => r && r.id && r.name);
+                const localIds = new Set(recipes.map(r => r.id));
+                recipes = [...recipes, ...approved.filter(r => !localIds.has(r.id))];
+                filterRecipes();
+            } catch (err) { console.error("Gagal memuat resep komunitas:", err); }
+        }
+        window.loadApprovedCommunityRecipes = loadApprovedCommunityRecipes;
         async function refreshRatingSummaries() {
             try {
                 const data = await apiRequest('/ratings');
