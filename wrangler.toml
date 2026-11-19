@@ -10,5 +10,5 @@ run_worker_first = ["/api/*"]
 [[d1_databases]]
 binding = "DB"
 database_name = "rasantara-db"
-database_id = "REPLACE_WITH_D1_DATABASE_ID"
+database_id = "34af0613-ff48-4f35-978c-6811897010ca"
 
