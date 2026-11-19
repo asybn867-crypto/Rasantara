@@ -83,6 +83,12 @@
     account.appendChild(b);
   }
   function watchUser() {
+    const originalUpdate = window.updateUserUI;
+    if (typeof originalUpdate === "function" && !originalUpdate.__rsWrapped) {
+      const wrapped = function(){ originalUpdate.apply(this, arguments); addAdminButton(); };
+      wrapped.__rsWrapped = true;
+      window.updateUserUI = wrapped;
+    }
     addAdminButton();
     const target=document.getElementById("accountSection");
     if(target)new MutationObserver(addAdminButton).observe(target,{childList:true,subtree:true});
