@@ -552,7 +552,9 @@
     <script src="recipes-data.js"></script>
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        const defaultRecipes = window.RASANTARA_DEFAULT_RECIPES || [];
+        const allDefaultRecipes = window.RASANTARA_DEFAULT_RECIPES || [];
+        const removedDefaultRecipeIds = new Set(JSON.parse(localStorage.getItem('rasantara_removed_default_recipe_ids') || '[]'));
+        const defaultRecipes = allDefaultRecipes.filter(recipe => !removedDefaultRecipeIds.has(recipe.id));
         const savedRecipes = JSON.parse(localStorage.getItem('rasantara_recipes') || '[]');
         let recipes = [...defaultRecipes, ...savedRecipes.filter(saved => !defaultRecipes.some(item => item.id === saved.id))];
         localStorage.setItem('rasantara_recipes', JSON.stringify(recipes));
