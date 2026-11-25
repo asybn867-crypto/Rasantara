@@ -549,11 +549,12 @@
         </div>
     </footer>
 
+    <script src="recipes-data.js"></script>
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        const defaultRecipes = [];
-        const removedDefaultRecipeIds = new Set(['rendang','rawon','soto-banjar','coto-makassar','ayam-taliwang','sei-sapi','papeda-ikan-kuah-kunung']);
-        let recipes = (JSON.parse(localStorage.getItem('rasantara_recipes')) || defaultRecipes).filter(recipe => !removedDefaultRecipeIds.has(recipe.id));
+        const defaultRecipes = window.RASANTARA_DEFAULT_RECIPES || [];
+        const savedRecipes = JSON.parse(localStorage.getItem('rasantara_recipes') || '[]');
+        let recipes = [...defaultRecipes, ...savedRecipes.filter(saved => !defaultRecipes.some(item => item.id === saved.id))];
         localStorage.setItem('rasantara_recipes', JSON.stringify(recipes));
         let ratingSummaryCache = {};
         let currentUser = localStorage.getItem('rasantara_token') ? (JSON.parse(localStorage.getItem('rasantara_current_user')) || null) : null;
